@@ -2,6 +2,7 @@
 
 import { Calendar, FileText, MoreHorizontal, User } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "../../src/components/ui/button"
 import { Card, CardContent, CardHeader } from "../../src/components/ui/card"
 import {
@@ -58,6 +59,7 @@ const resumes = [
 ]
 
 export default function ResumesPage() {
+  const router = useRouter()
   const handleEdit = (id: number) => {
     console.log("Edit resume:", id)
   }
@@ -73,12 +75,23 @@ export default function ResumesPage() {
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
-          <p className="text-zinc-400 text-lg">
-            Manage and organize your professional documents
-          </p>
+        {/* Header + Create Button */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
+            <p className="text-zinc-400 text-lg">
+              Manage and organize your professional documents
+            </p>
+          </div>
+          <Button
+            variant="default"
+            size="lg"
+            className="bg-zinc-800 text-white hover:bg-zinc-700 font-bold px-6 py-3 text-lg flex items-center gap-2 border border-zinc-700 shadow-md"
+            aria-label="Create New Resume"
+            onClick={() => router.push("/resumes/1")}
+          >
+            Create <span className="text-2xl leading-none">+</span>
+          </Button>
         </div>
 
         {/* Stats */}
