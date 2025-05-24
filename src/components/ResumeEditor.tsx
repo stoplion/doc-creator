@@ -4,11 +4,13 @@ import { json } from "@codemirror/lang-json"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView } from "@codemirror/view"
 import CodeMirror from "@uiw/react-codemirror"
+import { Home } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { resumeSchema } from "../lib/schema"
 import { cn } from "../lib/utils"
-import { FileUploaderBox } from "./ui/FileUploaderBox"
-import SwitchGroup from "./ui/switch-group"
+import { FileUploaderBox } from "./custom/FileUploaderBox"
+import SwitchGroup from "./custom/switch-group"
 
 interface ResumeEditorProps {
   initialValue: string
@@ -19,6 +21,7 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
   const [code, setCode] = useState(initialValue)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [selected, setSelected] = useState("upload")
+  const router = useRouter()
 
   const handleValueChange = useCallback(
     (value: string) => {
@@ -103,7 +106,13 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
     <div className="h-full w-full bg-zinc-900 text-white">
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Resume JSON</h2>
+          <button
+            onClick={() => router.push("/resumes")}
+            className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            <span>Home</span>
+          </button>
           <div className="flex gap-2 items-center">
             {validationError && (
               <span className="text-red-500 text-sm">Schema Error</span>

@@ -1,6 +1,15 @@
+import {
+  Briefcase,
+  Github,
+  Globe,
+  GraduationCap,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react"
 import type { ResumeData } from "../../lib/types"
-import { Badge } from "../ui/badge"
-import { Briefcase, GraduationCap, Mail, MapPin, Phone, Globe, Github, Linkedin } from "lucide-react"
+import { Badge } from "../custom/badge"
 
 interface ResumeTemplateProps {
   data: ResumeData
@@ -11,14 +20,21 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
     <div className="p-4 sm:p-6 md:p-8 font-sans">
       {/* Header - More responsive with smaller padding and font sizes */}
       <header className="mb-4 sm:mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{data.basics.name}</h1>
-        <h2 className="text-lg sm:text-xl text-gray-600 mt-1">{data.basics.label}</h2>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          {data.basics.name}
+        </h1>
+        <h2 className="text-lg sm:text-xl text-gray-600 mt-1">
+          {data.basics.label}
+        </h2>
 
         <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-gray-600">
           {data.basics.email && (
             <div className="flex items-center gap-1">
               <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <a href={`mailto:${data.basics.email}`} className="hover:text-gray-900 truncate">
+              <a
+                href={`mailto:${data.basics.email}`}
+                className="hover:text-gray-900 truncate"
+              >
                 {data.basics.email}
               </a>
             </div>
@@ -27,7 +43,10 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           {data.basics.phone && (
             <div className="flex items-center gap-1">
               <Phone className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <a href={`tel:${data.basics.phone}`} className="hover:text-gray-900">
+              <a
+                href={`tel:${data.basics.phone}`}
+                className="hover:text-gray-900"
+              >
                 {data.basics.phone}
               </a>
             </div>
@@ -61,9 +80,18 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
 
           {data.basics.profiles?.map((profile, index) => (
             <div key={index} className="flex items-center gap-1">
-              {profile.network === "GitHub" && <Github className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />}
-              {profile.network === "LinkedIn" && <Linkedin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />}
-              <a href={profile.url} target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 truncate">
+              {profile.network === "GitHub" && (
+                <Github className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              )}
+              {profile.network === "LinkedIn" && (
+                <Linkedin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              )}
+              <a
+                href={profile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-900 truncate"
+              >
                 {profile.username}
               </a>
             </div>
@@ -81,7 +109,9 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 border-b border-gray-200 pb-1 mb-2 sm:mb-3">
                 Summary
               </h3>
-              <p className="text-sm sm:text-base text-gray-700 whitespace-pre-line">{data.basics.summary}</p>
+              <p className="text-sm sm:text-base text-gray-700 whitespace-pre-line">
+                {data.basics.summary}
+              </p>
             </section>
           )}
 
@@ -89,22 +119,31 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           {data.work && data.work.length > 0 && (
             <section className="mb-4 sm:mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 border-b border-gray-200 pb-1 mb-2 sm:mb-3 flex items-center gap-1 sm:gap-2">
-                <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> Work Experience
+                <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />{" "}
+                Work Experience
               </h3>
 
               {data.work.map((work, index) => (
                 <div key={index} className="mb-3 sm:mb-4">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                     <div>
-                      <h4 className="text-sm sm:text-base font-medium text-gray-900">{work.position}</h4>
-                      <h5 className="text-xs sm:text-sm text-gray-700">{work.company}</h5>
+                      <h4 className="text-sm sm:text-base font-medium text-gray-900">
+                        {work.position}
+                      </h4>
+                      <h5 className="text-xs sm:text-sm text-gray-700">
+                        {work.company}
+                      </h5>
                     </div>
                     <div className="text-xs text-gray-600 mt-1 sm:mt-0">
                       {work.startDate} - {work.endDate || "Present"}
                     </div>
                   </div>
 
-                  {work.summary && <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700">{work.summary}</p>}
+                  {work.summary && (
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700">
+                      {work.summary}
+                    </p>
+                  )}
 
                   {work.highlights && work.highlights.length > 0 && (
                     <ul className="mt-1 sm:mt-2 list-disc list-inside text-xs sm:text-sm text-gray-700">
@@ -129,8 +168,14 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
                 <div key={index} className="mb-3 sm:mb-4">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                     <div>
-                      <h4 className="text-sm sm:text-base font-medium text-gray-900">{project.name}</h4>
-                      {project.entity && <h5 className="text-xs sm:text-sm text-gray-700">{project.entity}</h5>}
+                      <h4 className="text-sm sm:text-base font-medium text-gray-900">
+                        {project.name}
+                      </h4>
+                      {project.entity && (
+                        <h5 className="text-xs sm:text-sm text-gray-700">
+                          {project.entity}
+                        </h5>
+                      )}
                     </div>
                     {(project.startDate || project.endDate) && (
                       <div className="text-xs text-gray-600 mt-1 sm:mt-0">
@@ -140,7 +185,9 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
                   </div>
 
                   {project.description && (
-                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700">{project.description}</p>
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-700">
+                      {project.description}
+                    </p>
                   )}
 
                   {project.highlights && project.highlights.length > 0 && (
@@ -167,10 +214,16 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
 
               {data.skills.map((skillGroup, index) => (
                 <div key={index} className="mb-3 sm:mb-4">
-                  <h4 className="text-sm sm:text-base font-medium text-gray-900">{skillGroup.name}</h4>
+                  <h4 className="text-sm sm:text-base font-medium text-gray-900">
+                    {skillGroup.name}
+                  </h4>
                   <div className="mt-1 sm:mt-2 flex flex-wrap gap-1 sm:gap-2">
                     {skillGroup.keywords.map((skill, i) => (
-                      <Badge key={i} variant="outline" className="bg-gray-100 text-xs">
+                      <Badge
+                        key={i}
+                        variant="outline"
+                        className="bg-gray-100 text-xs"
+                      >
                         {skill}
                       </Badge>
                     ))}
@@ -184,12 +237,15 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           {data.education && data.education.length > 0 && (
             <section className="mb-4 sm:mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 border-b border-gray-200 pb-1 mb-2 sm:mb-3 flex items-center gap-1 sm:gap-2">
-                <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> Education
+                <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />{" "}
+                Education
               </h3>
 
               {data.education.map((edu, index) => (
                 <div key={index} className="mb-3 sm:mb-4">
-                  <h4 className="text-sm sm:text-base font-medium text-gray-900">{edu.institution}</h4>
+                  <h4 className="text-sm sm:text-base font-medium text-gray-900">
+                    {edu.institution}
+                  </h4>
                   <div className="text-xs sm:text-sm text-gray-700">
                     {edu.studyType} {edu.area && `in ${edu.area}`}
                     {edu.score && `, GPA: ${edu.score}`}
@@ -229,9 +285,15 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
 
               {data.certificates.map((cert, index) => (
                 <div key={index} className="mb-2">
-                  <div className="text-sm sm:text-base font-medium text-gray-900">{cert.name}</div>
-                  <div className="text-xs sm:text-sm text-gray-700">{cert.issuer}</div>
-                  {cert.date && <div className="text-xs text-gray-600">{cert.date}</div>}
+                  <div className="text-sm sm:text-base font-medium text-gray-900">
+                    {cert.name}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-700">
+                    {cert.issuer}
+                  </div>
+                  {cert.date && (
+                    <div className="text-xs text-gray-600">{cert.date}</div>
+                  )}
                 </div>
               ))}
             </section>

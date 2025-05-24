@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -10,8 +9,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Disable server-side features since we're doing static export
-  trailingSlash: true,
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
 }
 
 export default nextConfig

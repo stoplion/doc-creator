@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { ResumeEditor } from "../src/components/ResumeEditor"
-import { ResumePreview } from "../src/components/ResumePreview"
+import { ResumeEditor } from "../../../src/components/ResumeEditor"
+import { ResumePreview } from "../../../src/components/ResumePreview"
 import {
   Panel,
   PanelGroup,
   PanelResizeHandle,
-} from "../src/components/ui/resizable"
-import { defaultResumeData } from "../src/lib/default-data"
+} from "../../../src/components/custom/resizable"
+import { defaultResumeData } from "../../../src/lib/default-data"
 
 export default function Home() {
   const [resumeData, setResumeData] = useState(defaultResumeData)

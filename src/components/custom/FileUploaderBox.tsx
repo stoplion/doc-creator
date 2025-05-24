@@ -2,12 +2,14 @@
 
 import { CheckCircle, FileText, Upload, XCircle } from "lucide-react"
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react"
-import { Button } from "../../../components/ui/button"
+import { Button } from "../ui/button"
 
 export function FileUploaderBox() {
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -70,6 +72,38 @@ export function FileUploaderBox() {
     setError(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
+    }
+  }
+
+  const handleUpload = async () => {
+    if (!file) return
+
+    setIsUploading(true)
+    setError(null)
+    setUploadSuccess(false)
+
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Upload failed")
+      }
+
+      setUploadSuccess(true)
+      // Optionally reset the file after successful upload
+      // setFile(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed")
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -146,10 +180,32 @@ export function FileUploaderBox() {
               </Button>
             </div>
             <div className="flex justify-center mt-3">
-              <div className="flex items-center text-green-400">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                <span className="text-xs text-green-300">Ready to upload</span>
-              </div>
+              {!uploadSuccess ? (
+                <Button
+                  onClick={handleUpload}
+                  disabled={isUploading}
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Resume
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <div className="flex items-center text-green-400">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <span className="text-xs text-green-300">
+                    Upload successful!
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}
