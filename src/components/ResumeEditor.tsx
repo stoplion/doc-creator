@@ -7,6 +7,7 @@ import CodeMirror from "@uiw/react-codemirror"
 import { useCallback, useMemo, useState } from "react"
 import { resumeSchema } from "../lib/schema"
 import { cn } from "../lib/utils"
+import { FileUploaderBox } from "./ui/FileUploaderBox"
 import SwitchGroup from "./ui/switch-group"
 
 interface ResumeEditorProps {
@@ -115,7 +116,7 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
             </button>
             {/* switch group here */}
             <SwitchGroup
-              options={["upload", "json"]}
+              options={["json", "upload"]}
               value={selected}
               onChange={setSelected}
             />
@@ -126,15 +127,19 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
             {validationError}
           </div>
         )}
-        <div className="flex-1 min-h-0">
-          <CodeMirror
-            value={code}
-            height="100%"
-            theme={oneDark}
-            extensions={extensions}
-            onChange={handleValueChange}
-            className={editorClassName}
-          />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          {selected === "json" ? (
+            <CodeMirror
+              value={code}
+              height="100%"
+              theme={oneDark}
+              extensions={extensions}
+              onChange={handleValueChange}
+              className={editorClassName}
+            />
+          ) : (
+            <FileUploaderBox />
+          )}
         </div>
       </div>
     </div>

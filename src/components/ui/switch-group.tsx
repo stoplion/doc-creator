@@ -12,7 +12,7 @@ const SwitchGroup: React.FC<SwitchGroupProps> = ({
   onChange,
 }) => {
   return (
-    <div className="inline-flex rounded bg-white">
+    <div className="inline-flex rounded">
       {options.map((option, idx) => {
         const isSelected = value === option
         const isFirst = idx === 0
