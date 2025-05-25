@@ -20,7 +20,7 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     },
     "allowJs": true,
     "incremental": true,
@@ -32,7 +32,15 @@
     ],
     "types": ["react", "react-dom", "node", "prismjs"]
   },
-  "include": ["src", ".next/types/**/*.ts"],
+  "include": [
+    "src",
+    ".next/types/**/*.ts",
+    "middleware.ts",
+    "components",
+    "hooks",
+    "lib",
+    "utils"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

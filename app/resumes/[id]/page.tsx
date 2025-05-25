@@ -1,14 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { ResumeEditor } from "../../../src/components/ResumeEditor"
-import { ResumePreview } from "../../../src/components/ResumePreview"
+import { Navbar } from "../../../components/Navbar"
+import { ResumeEditor } from "../../../components/ResumeEditor"
+import { ResumePreview } from "../../../components/ResumePreview"
 import {
   Panel,
   PanelGroup,
   PanelResizeHandle,
-} from "../../../src/components/custom/resizable"
-import { defaultResumeData } from "../../../src/lib/default-data"
+} from "../../../components/custom/resizable"
+import { defaultResumeData } from "../../../utils/default-data"
 
 export default function Home() {
   const [resumeData, setResumeData] = useState(defaultResumeData)
@@ -25,6 +26,7 @@ export default function Home() {
 
   return (
     <main className="h-screen w-full overflow-hidden">
+      <Navbar />
       <PanelGroup direction="horizontal" className="h-full">
         <Panel defaultSize={40} minSize={0}>
           <ResumeEditor

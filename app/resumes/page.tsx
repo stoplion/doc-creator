@@ -3,14 +3,15 @@
 import { Calendar, FileText, MoreHorizontal, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Button } from "../../src/components/ui/button"
-import { Card, CardContent, CardHeader } from "../../src/components/ui/card"
+import { Navbar } from "../../components/Navbar"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent, CardHeader } from "../../components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../src/components/ui/dropdown-menu"
+} from "../../components/ui/dropdown-menu"
 
 // Sample resume data
 const resumes = [
@@ -74,6 +75,7 @@ export default function ResumesPage() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         {/* Header + Create Button */}
         <div className="flex items-center justify-between mb-8">
