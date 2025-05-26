@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { Database } from "../../database.types"
 /* 
 To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. 
@@ -9,7 +10,7 @@ These utility functions adapt @supabase/ssr's cookie handling for Next.js.
 export async function createClient() {
   const cookieStore = await cookies()
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

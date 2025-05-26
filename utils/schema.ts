@@ -27,9 +27,9 @@ const basicsSchema = z.object({
 })
 
 const workSchema = z.object({
-  name: z.string(),
+  company: z.string(),
   position: z.string(),
-  url: z.string().url().optional(),
+  website: z.string().url().optional(),
   startDate: z.string(),
   endDate: z.string().optional(),
   summary: z.string().optional(),

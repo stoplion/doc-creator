@@ -1,9 +1,8 @@
-"use client"
-
+import { formatDistanceToNow } from "date-fns"
 import { Calendar, FileText, MoreHorizontal, User } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Navbar } from "../../components/Navbar"
+import { notFound } from "next/navigation"
+import { NavbarIndex } from "../../components/Navbar"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader } from "../../components/ui/card"
 import {
@@ -12,70 +11,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
+import { createClient } from "../../utils/supabase/server"
+import { cloneResume, deleteResume } from "../actions/resume"
 
-// Sample resume data
-const resumes = [
-  {
-    id: 1,
-    title: "Software Engineer Resume",
-    lastModified: "2 days ago",
-    template: "Modern",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-  {
-    id: 2,
-    title: "Product Manager CV",
-    lastModified: "1 week ago",
-    template: "Professional",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-  {
-    id: 3,
-    title: "UX Designer Portfolio",
-    lastModified: "3 days ago",
-    template: "Creative",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-  {
-    id: 4,
-    title: "Marketing Specialist Resume",
-    lastModified: "5 days ago",
-    template: "Clean",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-  {
-    id: 5,
-    title: "Data Scientist CV",
-    lastModified: "1 day ago",
-    template: "Technical",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-  {
-    id: 6,
-    title: "Frontend Developer Resume",
-    lastModified: "4 days ago",
-    template: "Modern",
-    preview: "/placeholder.svg?height=200&width=150&text=Resume+Preview",
-  },
-]
+export default async function ResumesPage() {
+  const supabase = await createClient()
 
-export default function ResumesPage() {
-  const router = useRouter()
-  const handleEdit = (id: number) => {
-    console.log("Edit resume:", id)
+  // Get the current user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+  if (userError || !user) {
+    notFound()
   }
 
-  const handleClone = (id: number) => {
-    console.log("Clone resume:", id)
+  // Fetch user's resumes
+  const { data: resumes, error: resumesError } = await supabase
+    .from("resumes")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("updated_at", { ascending: false })
+
+  if (resumesError) {
+    console.error("Error fetching resumes:", resumesError)
+    notFound()
   }
 
-  const handleDelete = (id: number) => {
-    console.log("Delete resume:", id)
-  }
+  // Calculate stats
+  const totalResumes = resumes?.length || 0
+  const updatedThisWeek =
+    resumes?.filter((resume) => {
+      const updatedAt = new Date(resume.updated_at)
+      const oneWeekAgo = new Date()
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+      return updatedAt >= oneWeekAgo
+    }).length || 0
+  const uniqueTemplates = new Set(resumes?.map((r) => r.template) || []).size
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
-      <Navbar />
+      <NavbarIndex />
       <div className="container mx-auto px-4 py-8">
         {/* Header + Create Button */}
         <div className="flex items-center justify-between mb-8">
@@ -85,15 +61,16 @@ export default function ResumesPage() {
               Manage and organize your professional documents
             </p>
           </div>
-          <Button
-            variant="default"
-            size="lg"
-            className="bg-zinc-800 text-white hover:bg-zinc-700 font-bold px-6 py-3 text-lg flex items-center gap-2 border border-zinc-700 shadow-md"
-            aria-label="Create New Resume"
-            onClick={() => router.push("/resumes/1")}
-          >
-            Create <span className="text-2xl leading-none">+</span>
-          </Button>
+          <Link href="/resumes/new">
+            <Button
+              variant="default"
+              size="lg"
+              className="bg-zinc-800 text-white hover:bg-zinc-700 font-bold px-6 py-3 text-lg flex items-center gap-2 border border-zinc-700 shadow-md"
+              aria-label="Create New Resume"
+            >
+              Create <span className="text-2xl leading-none">+</span>
+            </Button>
+          </Link>
         </div>
 
         {/* Stats */}
@@ -104,7 +81,7 @@ export default function ResumesPage() {
                 <FileText className="h-5 w-5 text-blue-400" />
                 <div>
                   <p className="text-2xl font-bold text-white">
-                    {resumes.length}
+                    {totalResumes}
                   </p>
                   <p className="text-zinc-400 text-sm">Total Resumes</p>
                 </div>
@@ -116,7 +93,9 @@ export default function ResumesPage() {
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-green-400" />
                 <div>
-                  <p className="text-2xl font-bold text-white">3</p>
+                  <p className="text-2xl font-bold text-white">
+                    {updatedThisWeek}
+                  </p>
                   <p className="text-zinc-400 text-sm">Updated This Week</p>
                 </div>
               </div>
@@ -127,7 +106,9 @@ export default function ResumesPage() {
               <div className="flex items-center space-x-2">
                 <User className="h-5 w-5 text-purple-400" />
                 <div>
-                  <p className="text-2xl font-bold text-white">5</p>
+                  <p className="text-2xl font-bold text-white">
+                    {uniqueTemplates}
+                  </p>
                   <p className="text-zinc-400 text-sm">Templates Used</p>
                 </div>
               </div>
@@ -136,10 +117,14 @@ export default function ResumesPage() {
         </div>
 
         {/* Resume Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {resumes.map((resume) => (
-            <Link key={resume.id} href={`/resumes/${resume.id}`}>
-              <Card className="bg-zinc-800 border-zinc-700 hover:bg-zinc-750 transition-colors group">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+          {resumes?.map((resume) => (
+            <Link
+              key={resume.id}
+              href={`/resumes/${resume.id}`}
+              className="h-full"
+            >
+              <Card className="bg-zinc-800 border-zinc-700 hover:bg-zinc-750 transition-colors group h-full flex flex-col">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -150,41 +135,62 @@ export default function ResumesPage() {
                         {resume.template} Template
                       </p>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                    <form
+                      action={async () => {
+                        "use server"
+                        const supabase = await createClient()
+                        await supabase
+                          .from("resumes")
+                          .delete()
+                          .eq("id", resume.id)
+                      }}
+                    >
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="bg-zinc-800 border-zinc-700"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="bg-zinc-800 border-zinc-700"
-                      >
-                        <DropdownMenuItem
-                          onClick={() => handleEdit(resume.id)}
-                          className="text-white hover:bg-zinc-700 focus:bg-zinc-700"
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleClone(resume.id)}
-                          className="text-white hover:bg-zinc-700 focus:bg-zinc-700"
-                        >
-                          Clone
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(resume.id)}
-                          className="text-red-400 hover:bg-zinc-700 focus:bg-zinc-700 hover:text-red-300"
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/resumes/${resume.id}`}>Edit</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <form
+                              action={async () => {
+                                await cloneResume(resume.id)
+                              }}
+                            >
+                              <button className="w-full text-left">
+                                Clone
+                              </button>
+                            </form>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <form
+                              action={async () => {
+                                await deleteResume(resume.id)
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="w-full text-left text-red-400 hover:text-red-300"
+                              >
+                                Delete
+                              </button>
+                            </form>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </form>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -200,7 +206,12 @@ export default function ResumesPage() {
                   {/* Last Modified */}
                   <div className="flex items-center text-sm text-zinc-400">
                     <Calendar className="h-4 w-4 mr-2" />
-                    <span>Modified {resume.lastModified}</span>
+                    <span>
+                      Modified{" "}
+                      {formatDistanceToNow(new Date(resume.updated_at), {
+                        addSuffix: true,
+                      })}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -208,17 +219,19 @@ export default function ResumesPage() {
           ))}
 
           {/* Add New Resume Card */}
-          <Card className="bg-zinc-800 border-zinc-700 border-dashed hover:bg-zinc-750 transition-colors cursor-pointer group">
-            <CardContent className="flex flex-col items-center justify-center h-full min-h-[300px] text-zinc-400 group-hover:text-white">
-              <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center mb-4 group-hover:bg-zinc-600">
-                <span className="text-2xl">+</span>
-              </div>
-              <h3 className="font-semibold mb-2">Create New Resume</h3>
-              <p className="text-sm text-center">
-                Start building your professional resume
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="/resumes/new" className="h-full">
+            <Card className="bg-zinc-800 border-zinc-700 border-dashed hover:bg-zinc-750 transition-colors cursor-pointer group h-full flex flex-col">
+              <CardContent className="flex flex-col items-center justify-center h-full text-zinc-400 group-hover:text-white">
+                <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center mb-4 group-hover:bg-zinc-600">
+                  <span className="text-2xl">+</span>
+                </div>
+                <h3 className="font-semibold mb-2">Create New Resume</h3>
+                <p className="text-sm text-center">
+                  Start building your professional resume
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>

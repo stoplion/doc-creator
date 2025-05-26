@@ -1,19 +1,19 @@
 "use client"
 
-import { createClient } from "@/utils/supabase/client"
 import { User as SupabaseUser } from "@supabase/supabase-js"
-import { Download, LogOut, MoreHorizontal, Settings, User } from "lucide-react"
+import { LogOut, User } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Button } from "./ui/button"
+import { createClient } from "../../utils/supabase/client"
+import { Button } from "../ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "../ui/dropdown-menu"
 
-export function Navbar() {
+export function NavbarIndex() {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const supabase = createClient()
 
@@ -39,48 +39,10 @@ export function Navbar() {
         <div className="flex items-center space-x-6">
           {/* Logo */}
           <div className="text-xl font-bold text-white">ResumeBuilder</div>
-
-          {/* Resume Name */}
-          <div className="text-sm text-white hover:underline cursor-pointer">
-            Default Resume
-          </div>
         </div>
 
         {/* Right Side */}
         <div className="flex items-center space-x-2">
-          {/* More Options */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-white hover:text-zinc-300 hover:bg-zinc-800"
-            title="More Options"
-          >
-            <MoreHorizontal className="h-6 w-6" strokeWidth={2.5} />
-            <span className="sr-only">More Options</span>
-          </Button>
-
-          {/* Download PDF */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-white hover:text-zinc-300 hover:bg-zinc-800"
-            title="Download PDF"
-          >
-            <Download className="h-6 w-6" strokeWidth={2.5} />
-            <span className="sr-only">Download PDF</span>
-          </Button>
-
-          {/* Settings */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-white hover:text-zinc-300 hover:bg-zinc-800"
-            title="Settings"
-          >
-            <Settings className="h-6 w-6" strokeWidth={2.5} />
-            <span className="sr-only">Settings</span>
-          </Button>
-
           {/* User Profile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

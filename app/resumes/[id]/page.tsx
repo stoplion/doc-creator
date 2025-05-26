@@ -1,44 +1,32 @@
-"use client"
+import { notFound, redirect } from "next/navigation"
+import { ResumeEditorLayout } from "../../../components/ResumeEditorLayout"
+import { createClient } from "../../../utils/supabase/server"
 
-import { useState } from "react"
-import { Navbar } from "../../../components/Navbar"
-import { ResumeEditor } from "../../../components/ResumeEditor"
-import { ResumePreview } from "../../../components/ResumePreview"
-import {
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from "../../../components/custom/resizable"
-import { defaultResumeData } from "../../../utils/default-data"
+export default async function ResumePage({
+  params,
+}: {
+  params: { id: string }
+}) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-export default function Home() {
-  const [resumeData, setResumeData] = useState(defaultResumeData)
-
-  const handleDataChange = (value: string) => {
-    try {
-      const parsedData = JSON.parse(value)
-      setResumeData(parsedData)
-    } catch (error) {
-      // If JSON is invalid, don't update the resume
-      console.error("Invalid JSON:", error)
-    }
+  if (!user) {
+    redirect("/login")
   }
 
-  return (
-    <main className="h-screen w-full overflow-hidden">
-      <Navbar />
-      <PanelGroup direction="horizontal" className="h-full">
-        <Panel defaultSize={40} minSize={0}>
-          <ResumeEditor
-            initialValue={JSON.stringify(defaultResumeData, null, 2)}
-            onChange={handleDataChange}
-          />
-        </Panel>
-        <PanelResizeHandle />
-        <Panel defaultSize={60}>
-          <ResumePreview data={resumeData} />
-        </Panel>
-      </PanelGroup>
-    </main>
-  )
+  // Fetch the resume data
+  const { data: resume, error: resumeError } = await supabase
+    .from("resumes")
+    .select("*")
+    .eq("id", parseInt(params.id))
+    .eq("user_id", user.id)
+    .single()
+
+  if (resumeError || !resume) {
+    notFound()
+  }
+
+  return <ResumeEditorLayout resume={resume} resumeId={resume.id} />
 }

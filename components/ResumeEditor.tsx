@@ -4,21 +4,21 @@ import { json } from "@codemirror/lang-json"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView } from "@codemirror/view"
 import CodeMirror from "@uiw/react-codemirror"
-import { Home } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
+import { Tables } from "../database.types"
 import { cn } from "../utils/cn"
 import { resumeSchema } from "../utils/schema"
 import { FileUploaderBox } from "./custom/FileUploaderBox"
 import SwitchGroup from "./custom/switch-group"
 
 interface ResumeEditorProps {
-  initialValue: string
+  resume: Tables<"resumes">
   onChange: (value: string) => void
 }
 
-export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
-  const [code, setCode] = useState(initialValue)
+export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
+  const [code, setCode] = useState(JSON.stringify(resume.data, null, 2))
   const [validationError, setValidationError] = useState<string | null>(null)
   const [selected, setSelected] = useState("upload")
   const router = useRouter()
@@ -49,30 +49,6 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
     },
     [onChange]
   )
-
-  const formatJson = useCallback(() => {
-    try {
-      const parsed = JSON.parse(code)
-      const result = resumeSchema.safeParse(parsed)
-
-      if (result.success) {
-        const formatted = JSON.stringify(parsed, null, 2)
-        setCode(formatted)
-        setValidationError(null)
-        onChange(formatted)
-      } else {
-        const formattedError = result.error.errors
-          .map(
-            (err: { path: (string | number)[]; message: string }) =>
-              `${err.path.join(".")}: ${err.message}`
-          )
-          .join("\n")
-        setValidationError(formattedError)
-      }
-    } catch (error) {
-      setValidationError("Invalid JSON format")
-    }
-  }, [code, onChange])
 
   const extensions = useMemo(
     () => [
@@ -105,27 +81,14 @@ export function ResumeEditor({ initialValue, onChange }: ResumeEditorProps) {
   return (
     <div className="h-full w-full bg-zinc-900 text-white">
       <div className="p-4 h-full flex flex-col">
-        <div className="flex justify-between items-center mb-4">
-          <button
-            onClick={() => router.push("/resumes")}
-            className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            <span>Home</span>
-          </button>
+        <div className="flex justify-end items-center mb-4">
           <div className="flex gap-2 items-center">
             {validationError && (
               <span className="text-red-500 text-sm">Schema Error</span>
             )}
-            <button
-              onClick={formatJson}
-              className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-            >
-              Format
-            </button>
             {/* switch group here */}
             <SwitchGroup
-              options={["json", "upload"]}
+              options={["form", "upload", "json"]}
               value={selected}
               onChange={setSelected}
             />
