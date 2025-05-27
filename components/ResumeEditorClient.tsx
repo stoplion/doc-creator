@@ -9,11 +9,13 @@ import { ResumeEditor } from "./ResumeEditor"
 interface ResumeEditorClientProps {
   resume: Tables<"resumes">
   resumeId: number
+  onResumeChange: (data: ResumeData) => void
 }
 
 export function ResumeEditorClient({
   resume,
   resumeId,
+  onResumeChange,
 }: ResumeEditorClientProps) {
   const [resumeData, setResumeData] = useState(resume.data as ResumeData)
   const supabase = createClient()
@@ -22,6 +24,7 @@ export function ResumeEditorClient({
     try {
       const parsedData = JSON.parse(value)
       setResumeData(parsedData)
+      onResumeChange(parsedData)
 
       // Update the resume in the database
       const { error } = await supabase
