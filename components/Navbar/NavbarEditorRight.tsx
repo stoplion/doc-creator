@@ -3,9 +3,19 @@
 import { User as SupabaseUser } from "@supabase/supabase-js"
 import { Download, LogOut, MoreHorizontal, Settings, User } from "lucide-react"
 import { useEffect, useState } from "react"
+import { updateResumeAction } from "../../app/actions/resume"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
 import { Button } from "../ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +24,18 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 
-export function NavbarEditorRight({ resume }: { resume: Tables<"resumes"> }) {
+export function NavbarEditorRight({
+  resume,
+  onTitleChange,
+}: {
+  resume: Tables<"resumes">
+  onTitleChange?: (newTitle: string) => void
+}) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const supabase = createClient()
+  const [isRenameOpen, setIsRenameOpen] = useState(false)
+  const [newTitle, setNewTitle] = useState(resume.title || "")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -37,9 +56,63 @@ export function NavbarEditorRight({ resume }: { resume: Tables<"resumes"> }) {
     <nav className="bg-zinc-900 border-b border-zinc-800 px-4 py-3">
       <div className="mx-auto flex items-center justify-between">
         {/* Left Side */}
-        <div className="text-sm text-white hover:underline cursor-pointer">
-          {resume.title}
-        </div>
+        <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
+          <DialogTrigger asChild>
+            <div
+              className="text-sm text-white hover:underline cursor-pointer"
+              title="Rename Resume"
+              onClick={() => setNewTitle(resume.title || "")}
+            >
+              {resume.title}
+            </div>
+          </DialogTrigger>
+          <DialogContent className="bg-zinc-900 border-zinc-800">
+            <DialogHeader>
+              <DialogTitle className="text-white">Rename Resume</DialogTitle>
+            </DialogHeader>
+            <div className="pb-3">
+              <input
+                className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-zinc-700 text-base text-zinc-300 placeholder:text-zinc-500"
+                value={newTitle || ""}
+                placeholder="Enter new title"
+                onChange={(e) => setNewTitle(e.target.value)}
+                autoFocus
+                disabled={loading}
+                onFocus={(e) => e.target.select()}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  variant="secondary"
+                  disabled={loading}
+                  className="bg-transparent border border-zinc-700 text-white hover:bg-zinc-800/60"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                variant="default"
+                className="bg-emerald-700 text-white hover:bg-emerald-600"
+                disabled={
+                  loading || !newTitle.trim() || newTitle === resume.title
+                }
+                onClick={async () => {
+                  setLoading(true)
+                  try {
+                    await updateResumeAction(resume.id, { title: newTitle })
+                    onTitleChange?.(newTitle)
+                    setIsRenameOpen(false)
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+              >
+                {loading ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Right Side */}
         <div className="flex items-center space-x-2">

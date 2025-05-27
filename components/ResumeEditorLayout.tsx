@@ -21,25 +21,33 @@ export function ResumeEditorLayout({
   const [currentResumeData, setCurrentResumeData] = useState<ResumeData>(
     resume.data as ResumeData
   )
+  const [currentResume, setCurrentResume] = useState(resume)
 
   const handleResumeChange = (newData: ResumeData) => {
     setCurrentResumeData(newData)
+  }
+
+  const handleTitleChange = (newTitle: string) => {
+    setCurrentResume((prev) => ({ ...prev, title: newTitle }))
   }
 
   return (
     <main className="h-screen w-full overflow-hidden">
       <PanelGroup direction="horizontal" className="h-full">
         <Panel defaultSize={40} minSize={0}>
-          <NavbarEditorLeft resume={resume} />
+          <NavbarEditorLeft resume={currentResume} />
           <ResumeEditorClient
-            resume={resume}
+            resume={currentResume}
             resumeId={resumeId}
             onResumeChange={handleResumeChange}
           />
         </Panel>
         <PanelResizeHandle />
         <Panel defaultSize={60}>
-          <NavbarEditorRight resume={resume} />
+          <NavbarEditorRight
+            resume={currentResume}
+            onTitleChange={handleTitleChange}
+          />
           <ResumePreview resumeData={currentResumeData} />
         </Panel>
       </PanelGroup>

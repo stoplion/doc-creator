@@ -1,28 +1,43 @@
 "use server"
 
-import { Tables } from "../../database.types"
-import { createClient } from "../../utils/supabase/client"
-
-type ResumeUpdate = Partial<
-  Pick<Tables<"resumes">, "data" | "title" | "template" | "preview">
->
+import { createClient } from "../../utils/supabase/server"
 
 // Resume Data Operations
 export async function updateResumeAction(resumeId: number, data: any) {
   const supabase = await createClient()
 
-  debugger
+  // Log the incoming data and resumeId
+  console.log("Updating resumeId:", resumeId)
+  console.log("Updating resume with:", JSON.stringify(data, null, 2))
+
+  // Log the current authenticated user
+  const { data: userData, error: userError } = await supabase.auth.getUser()
+  if (userError) {
+    console.log("Error fetching user:", userError)
+  } else {
+    console.log("Current user UID:", userData?.user?.id)
+  }
+
+  // Fetch the target row to log its user_id
+  const { data: targetRows, error: fetchError } = await supabase
+    .from("resumes")
+    .select("id, user_id, title")
+    .eq("id", resumeId)
+  if (fetchError) {
+    console.log("Error fetching target row:", fetchError)
+  } else {
+    console.log("Target row(s):", JSON.stringify(targetRows, null, 2))
+  }
+
   const { data: updatedData, error } = await supabase
     .from("resumes")
-    .update({ data })
+    .update(data)
     .eq("id", resumeId)
     .select()
 
-  console.log("Updated data:", updatedData)
-  debugger
-
+  console.log("Updated data:", JSON.stringify(updatedData, null, 2))
   if (error) {
-    debugger
+    console.log("Supabase error:", error)
     throw error
   }
 
