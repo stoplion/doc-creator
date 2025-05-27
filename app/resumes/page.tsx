@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
 import { createClient } from "../../utils/supabase/server"
-import { cloneResume, deleteResume } from "../actions/resume"
+import { cloneResumeAction, deleteResumeAction } from "../actions/resume"
 
 export default async function ResumesPage() {
   const supabase = await createClient()
@@ -166,7 +166,7 @@ export default async function ResumesPage() {
                           <DropdownMenuItem asChild>
                             <form
                               action={async () => {
-                                await cloneResume(resume.id)
+                                await cloneResumeAction(resume.id)
                               }}
                             >
                               <button className="w-full text-left">
@@ -177,7 +177,7 @@ export default async function ResumesPage() {
                           <DropdownMenuItem asChild>
                             <form
                               action={async () => {
-                                await deleteResume(resume.id)
+                                await deleteResumeAction(resume.id)
                               }}
                             >
                               <button

@@ -1,25 +1,36 @@
 "use server"
 
-import { createClient } from "../../utils/supabase/server"
+import { Tables } from "../../database.types"
+import { createClient } from "../../utils/supabase/client"
+
+type ResumeUpdate = Partial<
+  Pick<Tables<"resumes">, "data" | "title" | "template" | "preview">
+>
 
 // Resume Data Operations
-export async function updateResume(resumeId: number, data: any) {
+export async function updateResumeAction(resumeId: number, data: any) {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  debugger
+  const { data: updatedData, error } = await supabase
     .from("resumes")
     .update({ data })
     .eq("id", resumeId)
+    .select()
+
+  console.log("Updated data:", updatedData)
+  debugger
 
   if (error) {
+    debugger
     throw error
   }
 
-  return { success: true }
+  return { success: true, data: updatedData }
 }
 
 // Resume Management Operations
-export async function deleteResume(resumeId: number) {
+export async function deleteResumeAction(resumeId: number) {
   const supabase = await createClient()
 
   const { error } = await supabase.from("resumes").delete().eq("id", resumeId)
@@ -31,7 +42,7 @@ export async function deleteResume(resumeId: number) {
   return { success: true }
 }
 
-export async function cloneResume(resumeId: number) {
+export async function cloneResumeAction(resumeId: number) {
   const supabase = await createClient()
 
   const { data: originalResume, error: fetchError } = await supabase

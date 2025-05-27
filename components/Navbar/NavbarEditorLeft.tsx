@@ -1,15 +1,16 @@
 "use client"
 
 import { User as SupabaseUser } from "@supabase/supabase-js"
-import { Home, Save } from "lucide-react"
+import { Home, Loader2, Save } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { updateResume } from "../../app/actions/resume"
+import { updateResumeAction } from "../../app/actions/resume"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
 
 export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -41,12 +42,26 @@ export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
         {/* Right Side */}
         <button
           onClick={async () => {
-            await updateResume(resume.id, resume.data)
+            setIsSaving(true)
+            try {
+              await updateResumeAction(resume.id, { data: resume.data })
+            } finally {
+              setIsSaving(false)
+            }
           }}
-          className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors"
+          className="relative px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors min-w-[88px] justify-center"
         >
-          <Save className="h-4 w-4" />
-          <span>Save</span>
+          <span className={isSaving ? "invisible" : "visible"}>
+            <span className="flex items-center gap-2">
+              <Save className="h-4 w-4" />
+              <span>Save</span>
+            </span>
+          </span>
+          {isSaving && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          )}
         </button>
       </div>
     </nav>
