@@ -43,6 +43,7 @@ export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
         <button
           onClick={async () => {
             setIsSaving(true)
+            debugger
             try {
               await updateResumeAction(resume.id, { data: resume.data })
             } finally {

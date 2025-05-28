@@ -39,7 +39,8 @@
     "components",
     "hooks",
     "lib",
-    "utils"
+    "utils",
+    "schemas/resume.ts"
   ],
   "references": [
     {

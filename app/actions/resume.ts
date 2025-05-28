@@ -1,5 +1,6 @@
 "use server"
 
+import { redirect } from "next/navigation"
 import { createClient } from "../../utils/supabase/server"
 
 // Resume Data Operations
@@ -47,18 +48,28 @@ export async function updateResumeAction(resumeId: number, data: any) {
 // Resume Management Operations
 export async function deleteResumeAction(resumeId: number) {
   const supabase = await createClient()
-
   const { error } = await supabase.from("resumes").delete().eq("id", resumeId)
 
   if (error) {
     throw error
   }
 
-  return { success: true }
+  redirect("/resumes")
 }
 
 export async function cloneResumeAction(resumeId: number) {
   const supabase = await createClient()
+  console.log("Starting resume clone for ID:", resumeId)
+
+  // Get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    console.error("Clone failed: User not authenticated")
+    throw new Error("User not authenticated")
+  }
+  console.log("Cloning resume for user:", user.id)
 
   const { data: originalResume, error: fetchError } = await supabase
     .from("resumes")
@@ -67,19 +78,34 @@ export async function cloneResumeAction(resumeId: number) {
     .single()
 
   if (fetchError || !originalResume) {
+    console.error("Clone failed: Error fetching original resume:", fetchError)
     throw fetchError || new Error("Resume not found")
   }
+  console.log("Successfully fetched original resume:", {
+    id: originalResume.id,
+    title: originalResume.title,
+    template: originalResume.template,
+  })
+
+  // Create a new object without id and timestamps
+  const { id, created_at, updated_at, ...resumeToClone } = originalResume
 
   const { error: insertError } = await supabase.from("resumes").insert({
+    ...resumeToClone,
     title: `${originalResume.title} (Copy)`,
-    data: originalResume.data,
-    template: originalResume.template,
-    user_id: originalResume.user_id,
+    user_id: user.id,
   })
 
   if (insertError) {
+    console.error("Clone failed: Error inserting cloned resume:", insertError)
     throw insertError
   }
 
-  return { success: true }
+  console.log("Successfully cloned resume:", {
+    originalId: resumeId,
+    newTitle: `${originalResume.title} (Copy)`,
+    userId: user.id,
+  })
+
+  redirect("/resumes")
 }

@@ -1,18 +1,12 @@
 import { formatDistanceToNow } from "date-fns"
-import { Calendar, FileText, MoreHorizontal, User } from "lucide-react"
+import { Calendar, FileText, User } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { NavbarIndex } from "../../components/Navbar"
+import { ResumeDropdownMenu } from "../../components/custom/resume-dropdown-menu"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader } from "../../components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
 import { createClient } from "../../utils/supabase/server"
-import { cloneResumeAction, deleteResumeAction } from "../actions/resume"
 
 export default async function ResumesPage() {
   const supabase = await createClient()
@@ -135,62 +129,7 @@ export default async function ResumesPage() {
                         {resume.template} Template
                       </p>
                     </div>
-                    <form
-                      action={async () => {
-                        "use server"
-                        const supabase = await createClient()
-                        await supabase
-                          .from("resumes")
-                          .delete()
-                          .eq("id", resume.id)
-                      }}
-                    >
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="bg-zinc-800 border-zinc-700"
-                        >
-                          <DropdownMenuItem asChild>
-                            <Link href={`/resumes/${resume.id}`}>Edit</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <form
-                              action={async () => {
-                                await cloneResumeAction(resume.id)
-                              }}
-                            >
-                              <button className="w-full text-left">
-                                Clone
-                              </button>
-                            </form>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <form
-                              action={async () => {
-                                await deleteResumeAction(resume.id)
-                              }}
-                            >
-                              <button
-                                type="submit"
-                                className="w-full text-left text-red-400 hover:text-red-300"
-                              >
-                                Delete
-                              </button>
-                            </form>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </form>
+                    <ResumeDropdownMenu resume={resume} />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">

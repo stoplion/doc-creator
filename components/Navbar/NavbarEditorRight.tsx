@@ -1,11 +1,12 @@
 "use client"
 
 import { User as SupabaseUser } from "@supabase/supabase-js"
-import { Download, LogOut, MoreHorizontal, Settings, User } from "lucide-react"
+import { Download, LogOut, Settings, User } from "lucide-react"
 import { useEffect, useState } from "react"
 import { updateResumeAction } from "../../app/actions/resume"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
+import { ResumeDropdownMenu } from "../custom/resume-dropdown-menu"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -66,6 +67,7 @@ export function NavbarEditorRight({
               {resume.title}
             </div>
           </DialogTrigger>
+
           <DialogContent className="bg-zinc-900 border-zinc-800">
             <DialogHeader>
               <DialogTitle className="text-white">Rename Resume</DialogTitle>
@@ -117,15 +119,7 @@ export function NavbarEditorRight({
         {/* Right Side */}
         <div className="flex items-center space-x-2">
           {/* More Options */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-white hover:text-zinc-300 hover:bg-zinc-800"
-            title="More Options"
-          >
-            <MoreHorizontal className="h-6 w-6" strokeWidth={2.5} />
-            <span className="sr-only">More Options</span>
-          </Button>
+          <ResumeDropdownMenu resume={resume} exclude={["edit"]} />
 
           {/* Download PDF */}
           <Button

@@ -13,6 +13,9 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.8",
+    "@jsonforms/core": "^3.5.1",
+    "@jsonforms/react": "^3.5.1",
+    "@jsonforms/vanilla-renderers": "^3.5.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -59,7 +62,8 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "type-fest": "^4.41.0",
-    "zod": "^3.25.13"
+    "zod": "^3.25.13",
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.15",

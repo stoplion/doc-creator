@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Database } from "../database.types"
-import type { ResumeData } from "../utils/schema"
+import type { ResumeData } from "../schemas/resume"
 import { Panel, PanelGroup, PanelResizeHandle } from "./custom/resizable"
 import { NavbarEditorLeft } from "./Navbar/NavbarEditorLeft"
 import { NavbarEditorRight } from "./Navbar/NavbarEditorRight"
@@ -25,6 +25,7 @@ export function ResumeEditorLayout({
 
   const handleResumeChange = (newData: ResumeData) => {
     setCurrentResumeData(newData)
+    setCurrentResume((prev) => ({ ...prev, data: newData }))
   }
 
   const handleTitleChange = (newTitle: string) => {

@@ -3,25 +3,52 @@
 import { json } from "@codemirror/lang-json"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView } from "@codemirror/view"
+import { JsonForms } from "@jsonforms/react"
+import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers"
 import CodeMirror from "@uiw/react-codemirror"
+import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
+import { zodToJsonSchema } from "zod-to-json-schema"
 import { Tables } from "../database.types"
+import { resumeSchema } from "../schemas/resume"
 import { cn } from "../utils/cn"
-import { resumeSchema } from "../utils/schema"
 import { FileUploaderBox } from "./custom/FileUploaderBox"
 import SwitchGroup from "./custom/switch-group"
 
 interface ResumeEditorProps {
   resume: Tables<"resumes">
   onChange: (value: string) => void
+  isSaving?: boolean
 }
 
-export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
+export function ResumeEditor({
+  resume,
+  onChange,
+  isSaving,
+}: ResumeEditorProps) {
   const [code, setCode] = useState(JSON.stringify(resume.data, null, 2))
   const [validationError, setValidationError] = useState<string | null>(null)
   const [selected, setSelected] = useState("upload")
   const router = useRouter()
+
+  const jsonSchema = useMemo(() => {
+    return JSON.stringify(
+      zodToJsonSchema(resumeSchema, "ResumeSchema"),
+      null,
+      2
+    )
+  }, [])
+
+  const parsedSchema = useMemo(() => {
+    try {
+      const parsed = JSON.parse(jsonSchema)
+      return parsed.definitions?.ResumeSchema || parsed
+    } catch (error) {
+      console.error("Failed to parse JSON schema:", error)
+      return {}
+    }
+  }, [jsonSchema])
 
   const handleValueChange = useCallback(
     (value: string) => {
@@ -78,6 +105,9 @@ export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
     [validationError]
   )
 
+  debugger
+  // JSON.parse(jsonSchema).definitions.ResumeSchema
+
   return (
     <div className="h-full w-full bg-zinc-900 text-white">
       <div className="p-4 h-full flex flex-col">
@@ -86,9 +116,14 @@ export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
             {validationError && (
               <span className="text-red-500 text-sm">Schema Error</span>
             )}
-            {/* switch group here */}
+            {isSaving && (
+              <div className="flex items-center gap-2 text-sm text-zinc-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
             <SwitchGroup
-              options={["form", "upload", "json"]}
+              options={["form", "upload", "json", "jsonschema"]}
               value={selected}
               onChange={setSelected}
             />
@@ -100,6 +135,15 @@ export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
           </div>
         )}
         <div className="flex-1 min-h-0 overflow-hidden">
+          {selected === "form" && (
+            <JsonForms
+              schema={parsedSchema}
+              data={resume.data}
+              onChange={handleValueChange}
+              renderers={vanillaRenderers}
+              cells={vanillaCells}
+            />
+          )}
           {selected === "json" ? (
             <CodeMirror
               value={code}
@@ -107,6 +151,14 @@ export function ResumeEditor({ resume, onChange }: ResumeEditorProps) {
               theme={oneDark}
               extensions={extensions}
               onChange={handleValueChange}
+              className={editorClassName}
+            />
+          ) : selected === "jsonschema" ? (
+            <CodeMirror
+              value={jsonSchema}
+              height="100%"
+              theme={oneDark}
+              extensions={extensions}
               className={editorClassName}
             />
           ) : (

@@ -1,4 +1,4 @@
-import type { ResumeData } from "./schema"
+import type { ResumeData } from "../schemas/resume"
 
 export const defaultResumeData: ResumeData = {
   basics: {
