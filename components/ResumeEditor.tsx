@@ -4,7 +4,6 @@ import { json } from "@codemirror/lang-json"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView, lineNumbers } from "@codemirror/view"
 import { JsonForms } from "@jsonforms/react"
-import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers"
 import CodeMirror from "@uiw/react-codemirror"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -15,6 +14,53 @@ import { Tables } from "../database.types"
 import { resumeSchema } from "../schemas/resume"
 import { cn } from "../utils/cn"
 import { safeParse } from "../utils/safeParse"
+import ButtonControl from "./custom-renderers/ButtonControl"
+import { buttonControlTester } from "./custom-renderers/ButtonControlTester"
+import {
+  BooleanCell,
+  booleanCellTester,
+  DateCell,
+  dateCellTester,
+  DateTimeCell,
+  dateTimeCellTester,
+  EnumCell,
+  enumCellTester,
+  IntegerCell,
+  integerCellTester,
+  NumberCell,
+  numberCellTester,
+  NumberFormatCell,
+  numberFormatCellTester,
+  OneOfEnumCell,
+  oneOfEnumCellTester,
+  SliderCell,
+  sliderCellTester,
+  TextAreaCell,
+  textAreaCellTester,
+  TextCell,
+  textCellTester,
+  TimeCell,
+  timeCellTester,
+} from "./custom-renderers/cell"
+import ArrayControlRenderer, {
+  arrayControlTester,
+} from "./custom-renderers/complex/array"
+import {
+  OneOfRadioGroupControl,
+  oneOfRadioGroupControlTester,
+  RadioGroupControl,
+  radioGroupControlTester,
+} from "./custom-renderers/controls"
+import {
+  GroupLayoutRenderer,
+  groupTester,
+  HorizontalLayoutRenderer,
+  horizontalLayoutTester,
+  VerticalLayoutRenderer,
+  verticalLayoutTester,
+} from "./custom-renderers/layouts"
+import TextInputControl from "./custom-renderers/TextInputControl"
+import { textInputControlTester } from "./custom-renderers/TextInputControlTester"
 import { FileUploaderBox } from "./custom/FileUploaderBox"
 import SwitchGroup from "./custom/switch-group"
 
@@ -120,8 +166,34 @@ export function ResumeEditor({
     [validationError]
   )
 
+  const renderers = [
+    { tester: verticalLayoutTester, renderer: VerticalLayoutRenderer },
+    { tester: horizontalLayoutTester, renderer: HorizontalLayoutRenderer },
+    { tester: groupTester, renderer: GroupLayoutRenderer },
+    { tester: textInputControlTester, renderer: TextInputControl },
+    { tester: buttonControlTester, renderer: ButtonControl },
+    { tester: arrayControlTester, renderer: ArrayControlRenderer },
+    { tester: radioGroupControlTester, renderer: RadioGroupControl },
+    { tester: oneOfRadioGroupControlTester, renderer: OneOfRadioGroupControl },
+  ]
+
+  const cells = [
+    { tester: booleanCellTester, cell: BooleanCell },
+    { tester: dateCellTester, cell: DateCell },
+    { tester: dateTimeCellTester, cell: DateTimeCell },
+    { tester: enumCellTester, cell: EnumCell },
+    { tester: integerCellTester, cell: IntegerCell },
+    { tester: numberCellTester, cell: NumberCell },
+    { tester: numberFormatCellTester, cell: NumberFormatCell },
+    { tester: oneOfEnumCellTester, cell: OneOfEnumCell },
+    { tester: sliderCellTester, cell: SliderCell },
+    { tester: textAreaCellTester, cell: TextAreaCell },
+    { tester: textCellTester, cell: TextCell },
+    { tester: timeCellTester, cell: TimeCell },
+  ]
+
   return (
-    <div className="h-full w-full bg-zinc-900 text-white">
+    <div className="h-full w-full bg-zinc-900 text-white dark">
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-end items-center mb-4">
           <div className="flex gap-2 items-center">
@@ -149,7 +221,7 @@ export function ResumeEditor({
         <div className="flex-1 min-h-0 overflow-hidden relative">
           <Switch>
             <Case condition={selected === "form"}>
-              <div className="overflow-scroll absolute top-0 bottom-0 w-full pb-[300px] bg-white text-black">
+              <div className="px-2 overflow-scroll absolute top-0 bottom-0 w-full pb-[300px">
                 <JsonForms
                   schema={parsedSchema}
                   data={resume.data}
@@ -157,12 +229,8 @@ export function ResumeEditor({
                     // handleValueChange(data)
                     console.log(data, errors)
                   }}
-                  // onChange={({ data, errors }) => {
-                  //   debugger
-                  //   console.log(data, errors)
-                  // }}
-                  renderers={vanillaRenderers}
-                  cells={vanillaCells}
+                  renderers={renderers}
+                  cells={cells}
                 />
               </div>
             </Case>
