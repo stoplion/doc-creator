@@ -1,6 +1,6 @@
 import { ControlProps } from "@jsonforms/core"
 import { withJsonFormsControlProps } from "@jsonforms/react"
-import { Input } from "../ui/input"
+import { Input } from "../../ui/input"
 
 export const TextInputControl = ({
   data,

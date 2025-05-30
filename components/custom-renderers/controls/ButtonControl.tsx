@@ -1,6 +1,6 @@
 import { ControlProps } from "@jsonforms/core"
 import { withJsonFormsControlProps } from "@jsonforms/react"
-import { Button } from "../ui/button"
+import { Button } from "../../ui/button"
 
 export const ButtonControl = ({
   data,

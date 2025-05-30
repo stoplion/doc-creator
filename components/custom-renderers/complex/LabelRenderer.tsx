@@ -4,16 +4,12 @@ import { withJsonFormsLabelProps } from "@jsonforms/react"
 
 export const labelRendererTester: RankedTester = rankWith(1, uiTypeIs("Label"))
 
-export const LabelRenderer = ({ text, visible }: LabelProps) => {
-  if (!visible) {
-    return null
+export const LabelRenderer = withJsonFormsLabelProps(
+  ({ text, visible }: LabelProps) => {
+    if (!visible) {
+      return null
+    }
+
+    return <Label>{text}</Label>
   }
-
-  return (
-    <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-      {text}
-    </Label>
-  )
-}
-
-export default withJsonFormsLabelProps(LabelRenderer)
+)

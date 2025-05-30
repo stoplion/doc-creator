@@ -1,66 +1,23 @@
 "use client"
 
 import { json } from "@codemirror/lang-json"
+import { yaml as yamlLang } from "@codemirror/lang-yaml"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView, lineNumbers } from "@codemirror/view"
 import { JsonForms } from "@jsonforms/react"
 import CodeMirror from "@uiw/react-codemirror"
+import * as jsYaml from "js-yaml"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { Case, Switch } from "react-if"
 import { zodToJsonSchema } from "zod-to-json-schema"
+// import {materialRenderers,materialCells} from "@jsonforms/material-renderers"
 import { Tables } from "../database.types"
 import { resumeSchema } from "../schemas/resume"
 import { cn } from "../utils/cn"
 import { safeParse } from "../utils/safeParse"
-import ButtonControl from "./custom-renderers/ButtonControl"
-import { buttonControlTester } from "./custom-renderers/ButtonControlTester"
-import {
-  BooleanCell,
-  booleanCellTester,
-  DateCell,
-  dateCellTester,
-  DateTimeCell,
-  dateTimeCellTester,
-  EnumCell,
-  enumCellTester,
-  IntegerCell,
-  integerCellTester,
-  NumberCell,
-  numberCellTester,
-  NumberFormatCell,
-  numberFormatCellTester,
-  OneOfEnumCell,
-  oneOfEnumCellTester,
-  SliderCell,
-  sliderCellTester,
-  TextAreaCell,
-  textAreaCellTester,
-  TextCell,
-  textCellTester,
-  TimeCell,
-  timeCellTester,
-} from "./custom-renderers/cell"
-import ArrayControlRenderer, {
-  arrayControlTester,
-} from "./custom-renderers/complex/array"
-import {
-  OneOfRadioGroupControl,
-  oneOfRadioGroupControlTester,
-  RadioGroupControl,
-  radioGroupControlTester,
-} from "./custom-renderers/controls"
-import {
-  GroupLayoutRenderer,
-  groupTester,
-  HorizontalLayoutRenderer,
-  horizontalLayoutTester,
-  VerticalLayoutRenderer,
-  verticalLayoutTester,
-} from "./custom-renderers/layouts"
-import TextInputControl from "./custom-renderers/TextInputControl"
-import { textInputControlTester } from "./custom-renderers/TextInputControlTester"
+import { cells, renderers } from "./custom-renderers"
 import { FileUploaderBox } from "./custom/FileUploaderBox"
 import SwitchGroup from "./custom/switch-group"
 
@@ -76,6 +33,7 @@ export function ResumeEditor({
   isSaving,
 }: ResumeEditorProps) {
   const [code, setCode] = useState(JSON.stringify(resume.data, null, 2))
+  const [yamlCode, setYamlCode] = useState(jsYaml.dump(resume.data))
   const [validationError, setValidationError] = useState<string | null>(null)
   const [selected, setSelected] = useState("upload")
   const router = useRouter()
@@ -100,9 +58,10 @@ export function ResumeEditor({
 
   const handleValueChange = useCallback(
     (value: string | object) => {
-      setCode(
+      const jsonValue =
         typeof value === "string" ? value : JSON.stringify(value, null, 2)
-      )
+      setCode(jsonValue)
+      setYamlCode(jsYaml.dump(JSON.parse(jsonValue)))
 
       const parsedResult = safeParse(value)
       if (!parsedResult.success) {
@@ -114,9 +73,7 @@ export function ResumeEditor({
 
       if (result.success) {
         setValidationError(null)
-        onChange(
-          typeof value === "string" ? value : JSON.stringify(value, null, 2)
-        )
+        onChange(jsonValue)
       } else {
         const formattedError = result.error.errors
           .map(
@@ -130,9 +87,51 @@ export function ResumeEditor({
     [onChange]
   )
 
+  const handleYamlChange = useCallback(
+    (value: string) => {
+      try {
+        const jsonValue = JSON.stringify(jsYaml.load(value), null, 2)
+        setCode(jsonValue)
+        setYamlCode(value)
+        handleValueChange(jsonValue)
+      } catch (error) {
+        console.error("Failed to parse YAML:", error)
+        setValidationError("Invalid YAML format")
+      }
+    },
+    [handleValueChange]
+  )
+
   const extensions = useMemo(
     () => [
       json(),
+      lineNumbers(),
+      EditorView.lineWrapping,
+      EditorView.theme({
+        "&": {
+          fontSize: "14px",
+          height: "100%",
+        },
+        ".cm-gutters": {
+          display: "block",
+          backgroundColor: "rgb(24 24 27)",
+          color: "rgb(161 161 170)",
+          borderRight: "1px solid rgb(63 63 70)",
+        },
+        ".cm-content": {
+          padding: "0.5rem",
+        },
+        ".cm-scroller": {
+          overflow: "auto",
+        },
+      }),
+    ],
+    []
+  )
+
+  const yamlExtensions = useMemo(
+    () => [
+      yamlLang(),
       lineNumbers(),
       EditorView.lineWrapping,
       EditorView.theme({
@@ -166,32 +165,6 @@ export function ResumeEditor({
     [validationError]
   )
 
-  const renderers = [
-    { tester: verticalLayoutTester, renderer: VerticalLayoutRenderer },
-    { tester: horizontalLayoutTester, renderer: HorizontalLayoutRenderer },
-    { tester: groupTester, renderer: GroupLayoutRenderer },
-    { tester: textInputControlTester, renderer: TextInputControl },
-    { tester: buttonControlTester, renderer: ButtonControl },
-    { tester: arrayControlTester, renderer: ArrayControlRenderer },
-    { tester: radioGroupControlTester, renderer: RadioGroupControl },
-    { tester: oneOfRadioGroupControlTester, renderer: OneOfRadioGroupControl },
-  ]
-
-  const cells = [
-    { tester: booleanCellTester, cell: BooleanCell },
-    { tester: dateCellTester, cell: DateCell },
-    { tester: dateTimeCellTester, cell: DateTimeCell },
-    { tester: enumCellTester, cell: EnumCell },
-    { tester: integerCellTester, cell: IntegerCell },
-    { tester: numberCellTester, cell: NumberCell },
-    { tester: numberFormatCellTester, cell: NumberFormatCell },
-    { tester: oneOfEnumCellTester, cell: OneOfEnumCell },
-    { tester: sliderCellTester, cell: SliderCell },
-    { tester: textAreaCellTester, cell: TextAreaCell },
-    { tester: textCellTester, cell: TextCell },
-    { tester: timeCellTester, cell: TimeCell },
-  ]
-
   return (
     <div className="h-full w-full bg-zinc-900 text-white dark">
       <div className="p-4 h-full flex flex-col">
@@ -207,7 +180,7 @@ export function ResumeEditor({
               </div>
             )}
             <SwitchGroup
-              options={["form", "upload", "json", "jsonschema"]}
+              options={["form", "upload", "json", "yaml", "jsonschema"]}
               value={selected}
               onChange={setSelected}
             />
@@ -240,6 +213,15 @@ export function ResumeEditor({
                 theme={oneDark}
                 extensions={extensions}
                 onChange={handleValueChange}
+                className={editorClassName}
+              />
+            </Case>
+            <Case condition={selected === "yaml"}>
+              <CodeMirror
+                value={yamlCode}
+                theme={oneDark}
+                extensions={yamlExtensions}
+                onChange={handleYamlChange}
                 className={editorClassName}
               />
             </Case>
