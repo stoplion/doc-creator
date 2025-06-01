@@ -38,7 +38,7 @@ export function NavbarIndex() {
         {/* Left Side */}
         <div className="flex items-center space-x-6">
           {/* Logo */}
-          <div className="text-xl font-bold text-white">ResumeBuilder</div>
+          <div className="text-xl font-bold text-white">Doc Builder</div>
         </div>
 
         {/* Right Side */}

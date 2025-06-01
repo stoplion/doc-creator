@@ -34,7 +34,19 @@ export type Database = {
   }
   public: {
     Tables: {
-      resumes: {
+      document_types: {
+        Row: {
+          type: string
+        }
+        Insert: {
+          type: string
+        }
+        Update: {
+          type?: string
+        }
+        Relationships: []
+      }
+      documents: {
         Row: {
           created_at: string
           data: Json | null
@@ -42,6 +54,7 @@ export type Database = {
           preview: string | null
           template: string | null
           title: string | null
+          type: string
           updated_at: string | null
           user_id: string
         }
@@ -52,6 +65,7 @@ export type Database = {
           preview?: string | null
           template?: string | null
           title?: string | null
+          type?: string
           updated_at?: string | null
           user_id: string
         }
@@ -62,10 +76,19 @@ export type Database = {
           preview?: string | null
           template?: string | null
           title?: string | null
+          type?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_type_fkey"
+            columns: ["type"]
+            isOneToOne: false
+            referencedRelation: "document_types"
+            referencedColumns: ["type"]
+          },
+        ]
       }
     }
     Views: {

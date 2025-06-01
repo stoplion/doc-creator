@@ -4,11 +4,15 @@ import { User as SupabaseUser } from "@supabase/supabase-js"
 import { Home, Loader2, Save } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { updateResumeAction } from "../../app/actions/resume"
+import { updateDocumentAction } from "../../app/actions/documentActions"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
 
-export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
+export function NavbarEditorLeft({
+  document,
+}: {
+  document: Tables<"documents">
+}) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
@@ -31,7 +35,7 @@ export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
         <div className="flex items-center space-x-6">
           {/* Logo */}
           <button
-            onClick={() => router.push("/resumes")}
+            onClick={() => router.push("/documents")}
             className="flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors"
           >
             <Home className="h-4 w-4" />
@@ -45,7 +49,7 @@ export function NavbarEditorLeft({ resume }: { resume: Tables<"resumes"> }) {
             setIsSaving(true)
             debugger
             try {
-              await updateResumeAction(resume.id, { data: resume.data })
+              await updateDocumentAction(document.id, { data: document.data })
             } finally {
               setIsSaving(false)
             }

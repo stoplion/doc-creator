@@ -1,12 +1,17 @@
 "use client"
 
 import { User as SupabaseUser } from "@supabase/supabase-js"
-import { Download, LogOut, Settings, User } from "lucide-react"
+import {
+  Download,
+  LogOut,
+  //Settings,
+  User,
+} from "lucide-react"
 import { useEffect, useState } from "react"
-import { updateResumeAction } from "../../app/actions/resume"
+import { updateDocumentAction } from "../../app/actions/documentActions"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
-import { ResumeDropdownMenu } from "../custom/resume-dropdown-menu"
+import { DocumentDropdownMenu } from "../misc/DocumentDropdownMenu"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -26,16 +31,16 @@ import {
 } from "../ui/dropdown-menu"
 
 export function NavbarEditorRight({
-  resume,
+  document,
   onTitleChange,
 }: {
-  resume: Tables<"resumes">
+  document: Tables<"documents">
   onTitleChange?: (newTitle: string) => void
 }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const supabase = createClient()
   const [isRenameOpen, setIsRenameOpen] = useState(false)
-  const [newTitle, setNewTitle] = useState(resume.title || "")
+  const [newTitle, setNewTitle] = useState(document.title || "")
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -61,16 +66,16 @@ export function NavbarEditorRight({
           <DialogTrigger asChild>
             <div
               className="text-sm text-white hover:underline cursor-pointer"
-              title="Rename Resume"
-              onClick={() => setNewTitle(resume.title || "")}
+              title="Rename Document"
+              onClick={() => setNewTitle(document.title || "")}
             >
-              {resume.title}
+              {document.title}
             </div>
           </DialogTrigger>
 
           <DialogContent className="bg-zinc-900 border-zinc-800">
             <DialogHeader>
-              <DialogTitle className="text-white">Rename Resume</DialogTitle>
+              <DialogTitle className="text-white">Rename Document</DialogTitle>
             </DialogHeader>
             <div className="pb-3">
               <input
@@ -97,12 +102,12 @@ export function NavbarEditorRight({
                 variant="default"
                 className="bg-emerald-700 text-white hover:bg-emerald-600"
                 disabled={
-                  loading || !newTitle.trim() || newTitle === resume.title
+                  loading || !newTitle.trim() || newTitle === document.title
                 }
                 onClick={async () => {
                   setLoading(true)
                   try {
-                    await updateResumeAction(resume.id, { title: newTitle })
+                    await updateDocumentAction(document.id, { title: newTitle })
                     onTitleChange?.(newTitle)
                     setIsRenameOpen(false)
                   } finally {
@@ -119,7 +124,7 @@ export function NavbarEditorRight({
         {/* Right Side */}
         <div className="flex items-center space-x-2">
           {/* More Options */}
-          <ResumeDropdownMenu resume={resume} exclude={["edit"]} />
+          <DocumentDropdownMenu document={document} exclude={["edit"]} />
 
           {/* Download PDF */}
           <Button
@@ -133,7 +138,7 @@ export function NavbarEditorRight({
           </Button>
 
           {/* Settings */}
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 text-white hover:text-zinc-300 hover:bg-zinc-800"
@@ -141,7 +146,7 @@ export function NavbarEditorRight({
           >
             <Settings className="h-6 w-6" strokeWidth={2.5} />
             <span className="sr-only">Settings</span>
-          </Button>
+          </Button> */}
 
           {/* User Profile */}
           <DropdownMenu>
