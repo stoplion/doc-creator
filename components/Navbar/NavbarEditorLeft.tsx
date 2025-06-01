@@ -7,11 +7,16 @@ import { useEffect, useState } from "react"
 import { updateDocumentAction } from "../../app/actions/documentActions"
 import { Tables } from "../../database.types"
 import { createClient } from "../../utils/supabase/client"
+import SwitchGroup from "../misc/SwitchGroup"
 
 export function NavbarEditorLeft({
   document,
+  selectedTab,
+  setSelectedTab,
 }: {
   document: Tables<"documents">
+  selectedTab: string
+  setSelectedTab: (tab: string) => void
 }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -42,7 +47,14 @@ export function NavbarEditorLeft({
             <span>Home</span>
           </button>
         </div>
-
+        {/* Center SwitchGroup */}
+        <div className="flex-1 flex justify-center">
+          <SwitchGroup
+            options={["form", "upload", "json", "yaml", "jsonschema"]}
+            value={selectedTab}
+            onChange={setSelectedTab}
+          />
+        </div>
         {/* Right Side */}
         <button
           onClick={async () => {

@@ -20,7 +20,6 @@ import { safeParse } from "../utils/safeParse"
 import { FieldErrorTemplate, ObjectFieldTemplate } from "./custom-templates"
 import { TextWidget } from "./custom-widgets"
 import { FileUploaderBox } from "./misc/FileUploaderBox"
-import SwitchGroup from "./misc/SwitchGroup"
 
 const uiSchema: UiSchema = {
   "ui:classNames": "bg-red-500",
@@ -30,17 +29,20 @@ interface DocumentEditorProps {
   document: Tables<"documents">
   onChange: (value: string) => void
   isSaving?: boolean
+  selectedTab: string
+  setSelectedTab: (tab: string) => void
 }
 
 export function DocumentEditor({
   document,
   onChange,
   isSaving,
+  selectedTab,
+  setSelectedTab,
 }: DocumentEditorProps) {
   const [code, setCode] = useState(JSON.stringify(document.data, null, 2))
   const [yamlCode, setYamlCode] = useState(jsYaml.dump(document.data))
   const [validationError, setValidationError] = useState<string | null>(null)
-  const [selected, setSelected] = useState("upload")
 
   const jsonSchema = useMemo(() => {
     return JSON.stringify(
@@ -183,11 +185,6 @@ export function DocumentEditor({
                 <span>Saving...</span>
               </div>
             )}
-            <SwitchGroup
-              options={["form", "upload", "json", "yaml", "jsonschema"]}
-              value={selected}
-              onChange={setSelected}
-            />
           </div>
         </div>
         {validationError && (
@@ -197,7 +194,7 @@ export function DocumentEditor({
         )}
         <div className="flex-1 min-h-0 overflow-hidden relative">
           <Switch>
-            <Case condition={selected === "form"}>
+            <Case condition={selectedTab === "form"}>
               <div className="px-2 overflow-scroll absolute top-0 bottom-0 w-full pb-[300px] dark">
                 <Form
                   uiSchema={uiSchema}
@@ -218,7 +215,7 @@ export function DocumentEditor({
                 />
               </div>
             </Case>
-            <Case condition={selected === "json"}>
+            <Case condition={selectedTab === "json"}>
               <CodeMirror
                 value={code}
                 theme={oneDark}
@@ -227,7 +224,7 @@ export function DocumentEditor({
                 className={editorClassName}
               />
             </Case>
-            <Case condition={selected === "yaml"}>
+            <Case condition={selectedTab === "yaml"}>
               <CodeMirror
                 value={yamlCode}
                 theme={oneDark}
@@ -236,7 +233,7 @@ export function DocumentEditor({
                 className={editorClassName}
               />
             </Case>
-            <Case condition={selected === "jsonschema"}>
+            <Case condition={selectedTab === "jsonschema"}>
               <CodeMirror
                 value={jsonSchema}
                 theme={oneDark}
@@ -244,7 +241,7 @@ export function DocumentEditor({
                 className={editorClassName}
               />
             </Case>
-            <Case condition={selected === "upload"}>
+            <Case condition={selectedTab === "upload"}>
               <FileUploaderBox />
             </Case>
           </Switch>

@@ -22,6 +22,7 @@ export function DocumentEditorLayout({
     document.data as ResumeData
   )
   const [currentDocument, setCurrentDocument] = useState(document)
+  const [selectedTab, setSelectedTab] = useState("upload")
 
   const handleDocumentChange = (newData: ResumeData) => {
     setCurrentDocumentData(newData)
@@ -36,11 +37,17 @@ export function DocumentEditorLayout({
     <main className="h-screen w-full overflow-hidden">
       <PanelGroup direction="horizontal" className="h-full">
         <Panel defaultSize={40} minSize={0}>
-          <NavbarEditorLeft document={currentDocument} />
+          <NavbarEditorLeft
+            document={currentDocument}
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
           <DocumentEditorClient
             document={currentDocument}
             documentId={documentId}
             onDocumentChange={handleDocumentChange}
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
           />
         </Panel>
         <PanelResizeHandle />

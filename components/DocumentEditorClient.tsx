@@ -10,12 +10,16 @@ interface DocumentEditorClientProps {
   document: Tables<"documents">
   documentId: number
   onDocumentChange: (data: ResumeData) => void
+  selectedTab: string
+  setSelectedTab: (tab: string) => void
 }
 
 export function DocumentEditorClient({
   document,
   documentId,
   onDocumentChange,
+  selectedTab,
+  setSelectedTab,
 }: DocumentEditorClientProps) {
   const [documentData, setDocumentData] = useState(document.data as ResumeData)
   const [isSaving, setIsSaving] = useState(false)
@@ -44,6 +48,8 @@ export function DocumentEditorClient({
       document={document}
       onChange={handleDataChange}
       isSaving={isSaving}
+      selectedTab={selectedTab}
+      setSelectedTab={setSelectedTab}
     />
   )
 }
