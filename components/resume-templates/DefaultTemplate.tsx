@@ -9,7 +9,7 @@ import {
   Phone,
 } from "lucide-react"
 import type { ResumeData } from "../../utils/types"
-import { Badge } from "../custom/badge"
+import { Badge } from "../misc/Badge"
 
 interface ResumeTemplateProps {
   resumeData: ResumeData

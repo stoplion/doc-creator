@@ -40,7 +40,7 @@
     "hooks",
     "lib",
     "utils",
-    "schemas/resume.ts"
+    "json-schemas/resumeSchema.ts"
   ],
   "references": [
     {
