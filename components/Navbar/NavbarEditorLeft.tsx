@@ -13,10 +13,14 @@ export function NavbarEditorLeft({
   document,
   selectedTab,
   setSelectedTab,
+  hasUnsavedChanges,
+  onSaveComplete,
 }: {
   document: Tables<"documents">
   selectedTab: string
   setSelectedTab: (tab: string) => void
+  hasUnsavedChanges: boolean
+  onSaveComplete: () => void
 }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -58,15 +62,21 @@ export function NavbarEditorLeft({
         {/* Right Side */}
         <button
           onClick={async () => {
+            if (!hasUnsavedChanges || isSaving) return
             setIsSaving(true)
-            debugger
             try {
               await updateDocumentAction(document.id, { data: document.data })
+              onSaveComplete()
             } finally {
               setIsSaving(false)
             }
           }}
-          className="relative px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded text-sm text-white transition-colors min-w-[88px] justify-center"
+          className={`relative px-3 py-1.5 rounded text-sm transition-colors min-w-[88px] justify-center ${
+            hasUnsavedChanges && !isSaving
+              ? "bg-zinc-700 hover:bg-zinc-600 text-white"
+              : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+          }`}
+          disabled={!hasUnsavedChanges || isSaving}
         >
           <span className={isSaving ? "invisible" : "visible"}>
             <span className="flex items-center gap-2">
