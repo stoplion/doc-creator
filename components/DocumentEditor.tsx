@@ -1,10 +1,12 @@
-"use client"
+// "use client"
 
 import { json } from "@codemirror/lang-json"
 import { yaml as yamlLang } from "@codemirror/lang-yaml"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView, lineNumbers } from "@codemirror/view"
-import Form, { IChangeEvent } from "@rjsf/core"
+// import Form, { IChangeEvent } from "@rjsf/core"
+import { IChangeEvent, withTheme } from "@rjsf/core"
+import { Theme as shadcnTheme } from "@rjsf/shadcn"
 import { RJSFSchema, UiSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import CodeMirror from "@uiw/react-codemirror"
@@ -14,14 +16,16 @@ import { zodToJsonSchema } from "zod-to-json-schema"
 import { Tables } from "../database.types"
 import { resumeSchema } from "../json-schemas/resumeSchema"
 import { cn } from "../utils/cn"
-import { FieldErrorTemplate, ObjectFieldTemplate } from "./custom-templates"
-import { TextWidget } from "./custom-widgets"
+import ArrayFieldItemTemplate from "./custom-templates/ArrayFieldItemTemplate"
+import ArrayFieldTemplate from "./custom-templates/ArrayFieldTemplate"
 import { FileUploaderBox } from "./misc/FileUploaderBox"
+
+const Form = withTheme(shadcnTheme)
 
 type Document = Tables<"documents">
 
 const uiSchema: UiSchema = {
-  "ui:classNames": "bg-red-500",
+  // "ui:classNames": "bg-red-500",
 }
 
 interface DocumentEditorProps {
@@ -100,7 +104,7 @@ export function DocumentEditor({
   const editorClassName = useMemo(
     () =>
       cn(
-        "h-full overflow-scroll rounded-md",
+        "h-full overflow-scroll",
         validationError && "border-2 border-red-500"
       ),
     [validationError]
@@ -130,12 +134,9 @@ export function DocumentEditor({
                   formData={document.data}
                   onChange={handleFormChange}
                   className="text-white"
-                  widgets={{
-                    TextWidget,
-                  }}
                   templates={{
-                    ObjectFieldTemplate,
-                    FieldErrorTemplate,
+                    ArrayFieldTemplate,
+                    ArrayFieldItemTemplate,
                   }}
                 />
               </div>

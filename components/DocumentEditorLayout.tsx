@@ -25,7 +25,7 @@ export function DocumentEditorLayout({ document }: DocumentEditorLayoutProps) {
     document.data as ResumeData
   )
   const [currentDocument, setCurrentDocument] = useState(document)
-  const [selectedTab, setSelectedTab] = useState("upload")
+  const [selectedTab, setSelectedTab] = useState("form")
   const [validationError, setValidationError] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
