@@ -140,7 +140,7 @@ export default function ObjectFieldTemplate<
     <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
       {title && (
         <CollapsibleTrigger asChild>
-          <div className="cursor-pointer">
+          <div className="cursor-pointer hover:bg-gray-800/50 rounded-md p-1 -m-1 transition-colors group">
             <TitleFieldTemplate
               id={titleId<T>(idSchema)}
               title={title}

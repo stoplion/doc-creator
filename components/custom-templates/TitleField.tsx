@@ -100,7 +100,7 @@ export default function TitleField<
     console.log("🟢 Rendering GREEN title:", displayTitle)
     return (
       <div id={id} className="my-2 flex flex-col gap-1">
-        <h3 className="text-green-600 font-semibold text-lg">
+        <h3 className="text-green-600 font-semibold text-lg group-hover:underline group-hover:decoration-green-400 group-hover:decoration-2 group-hover:underline-offset-2 transition-all">
           {displayTitle}
           {required && <span className="text-red-500 ml-1">*</span>}
         </h3>
@@ -116,7 +116,7 @@ export default function TitleField<
     console.log("⚪ Rendering DEFAULT title:", displayTitle)
     return (
       <div id={id} className="my-1 flex flex-col gap-0.5">
-        <h2 className="font-bold text-xl">
+        <h2 className="font-bold text-xl group-hover:underline group-hover:decoration-gray-400 group-hover:decoration-2 group-hover:underline-offset-2 transition-all">
           {displayTitle}
           {required && <span className="text-red-500 ml-1">*</span>}
         </h2>
