@@ -144,6 +144,9 @@ export function DocumentEditor({
                     ArrayFieldTitleTemplate: TitleField,
                     TitleFieldTemplate: TitleField,
                     ObjectFieldTemplate,
+                    ButtonTemplates: {
+                      SubmitButton: () => null,
+                    },
                   }}
                 />
               </div>

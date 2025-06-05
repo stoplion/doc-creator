@@ -6,8 +6,6 @@ import {
   TitleFieldProps,
 } from "@rjsf/utils"
 
-import { Separator } from "../../components/ui/separator"
-
 /** Helper function to detect nesting for primitive fields that bypass ObjectFieldTemplate */
 function detectPrimitiveFieldNesting(id: string): boolean {
   if (!id) return false
@@ -99,16 +97,11 @@ export default function TitleField<
     // Nested object titles - render in green
     console.log("🟢 Rendering GREEN title:", displayTitle)
     return (
-      <div id={id} className="my-2 flex flex-col gap-1">
+      <div id={id} className="my-1 flex flex-col">
         <h3 className="text-green-600 font-semibold text-lg group-hover:underline group-hover:decoration-green-400 group-hover:decoration-2 group-hover:underline-offset-2 transition-all">
           {displayTitle}
           {required && <span className="text-red-500 ml-1">*</span>}
         </h3>
-        <Separator
-          dir="horizontal"
-          style={{ height: "1px" }}
-          className="bg-green-200"
-        />
       </div>
     )
   } else {
