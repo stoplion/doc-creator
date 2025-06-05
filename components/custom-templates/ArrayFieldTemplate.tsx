@@ -1,5 +1,4 @@
 import {
-  ArrayFieldItemTemplateType,
   ArrayFieldTemplateProps,
   buttonId,
   FormContextType,
@@ -8,7 +7,14 @@ import {
   RJSFSchema,
   StrictRJSFSchema,
 } from "@rjsf/utils"
+import dynamic from "next/dynamic"
+import { useCallback } from "react"
 import AddButton from "../custom-widgets/AddButton"
+
+// Client-only drag and drop wrapper to prevent hydration mismatches
+const DragDropArrayItems = dynamic(() => import("./DragDropArrayItems"), {
+  ssr: false,
+})
 
 /** The `ArrayFieldTemplate` component is the template used to render all items in an array.
  *
@@ -50,6 +56,20 @@ export default function ArrayFieldTemplate<
     S,
     F
   >("ArrayFieldTitleTemplate", registry, uiOptions)
+
+  // Handle drag end event
+  const handleDragEnd = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      if (items && oldIndex !== newIndex) {
+        const item = items[oldIndex]
+        if (item.buttonsProps?.onReorderClick) {
+          item.buttonsProps.onReorderClick(oldIndex, newIndex)()
+        }
+      }
+    },
+    [items]
+  )
+
   // Button templates are not overridden in the uiSchema
   // const {
   //   ButtonTemplates: { AddButton },
@@ -77,15 +97,11 @@ export default function ArrayFieldTemplate<
             key={`array-item-list-${idSchema.$id}`}
             className="p-0 m-0 w-full mb-2"
           >
-            {items &&
-              items.map(
-                ({
-                  key,
-                  ...itemProps
-                }: ArrayFieldItemTemplateType<T, S, F>) => (
-                  <ArrayFieldItemTemplate key={key} {...itemProps} />
-                )
-              )}
+            <DragDropArrayItems
+              items={items}
+              ArrayFieldItemTemplate={ArrayFieldItemTemplate}
+              onDragEnd={handleDragEnd}
+            />
             {canAdd && (
               <div className="mt-2 flex">
                 <AddButton
