@@ -88,14 +88,6 @@ export default function ArrayFieldTemplate<
               )}
             {canAdd && (
               <div className="mt-2 flex">
-                {/* <AddButton
-                  id={buttonId<T>(idSchema, "add")}
-                  className="rjsf-array-item-add w-full"
-                  onClick={onAddClick}
-                  disabled={disabled || readonly}
-                  uiSchema={uiSchema}
-                  registry={registry}
-                /> */}
                 <AddButton
                   id={buttonId<T>(idSchema, "add")}
                   className="rjsf-array-item-add w-full"

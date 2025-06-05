@@ -4,6 +4,7 @@ import { json } from "@codemirror/lang-json"
 import { yaml as yamlLang } from "@codemirror/lang-yaml"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView, lineNumbers } from "@codemirror/view"
+import TitleField from "./custom-templates/TitleField"
 // import Form, { IChangeEvent } from "@rjsf/core"
 import { IChangeEvent, withTheme } from "@rjsf/core"
 import { Theme as shadcnTheme } from "@rjsf/shadcn"
@@ -18,7 +19,9 @@ import { resumeSchema } from "../json-schemas/resumeSchema"
 import { cn } from "../utils/cn"
 import ArrayFieldItemTemplate from "./custom-templates/ArrayFieldItemTemplate"
 import ArrayFieldTemplate from "./custom-templates/ArrayFieldTemplate"
+import ObjectFieldTemplate from "./custom-templates/ObjectFieldTemplate"
 import { FileUploaderBox } from "./misc/FileUploaderBox"
+import { testSchema } from "./ui-schemas/test"
 
 const Form = withTheme(shadcnTheme)
 
@@ -126,10 +129,11 @@ export function DocumentEditor({
         <div className="flex-1 min-h-0 overflow-hidden relative">
           <Switch>
             <Case condition={selectedTab === "form"}>
-              <div className="overflow-scroll absolute top-0 bottom-0 w-full pb-[300px]">
+              <div className="p-4 overflow-scroll absolute top-0 bottom-0 w-full pb-[300px]">
                 <Form
-                  uiSchema={uiSchema}
+                  // uiSchema={uiSchema}
                   schema={parsedSchema}
+                  uiSchema={testSchema as UiSchema}
                   validator={validator}
                   formData={document.data}
                   onChange={handleFormChange}
@@ -137,6 +141,8 @@ export function DocumentEditor({
                   templates={{
                     ArrayFieldTemplate,
                     ArrayFieldItemTemplate,
+                    TitleFieldTemplate: TitleField,
+                    ObjectFieldTemplate,
                   }}
                 />
               </div>

@@ -26,9 +26,9 @@ export default function ArrayFieldItemTemplate<
   >("ArrayFieldItemButtonsTemplate", registry, uiOptions)
   return (
     <div>
-      <div className="mb-2 flex flex-row flex-wrap">
+      <div className="mb-2 flex flex-row flex-wrap relative">
         <div className="grow shrink bg-red-900">{children}</div>
-        <div className="flex items-end justify-end p-0.5">
+        <div className="flex items-end justify-end p-0.5 top-0 right-0">
           {hasToolbar && (
             <div className="flex gap-2">
               <ArrayFieldItemButtonsTemplate {...buttonsProps} />
