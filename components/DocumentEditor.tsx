@@ -141,6 +141,7 @@ export function DocumentEditor({
                   templates={{
                     ArrayFieldTemplate,
                     ArrayFieldItemTemplate,
+                    ArrayFieldTitleTemplate: TitleField,
                     TitleFieldTemplate: TitleField,
                     ObjectFieldTemplate,
                   }}
