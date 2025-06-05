@@ -1,4 +1,9 @@
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
   buttonId,
   canExpand,
   descriptionId,
@@ -10,6 +15,7 @@ import {
   StrictRJSFSchema,
   titleId,
 } from "@rjsf/utils"
+import { useCallback, useState } from "react"
 
 /** The `ObjectFieldTemplate` is the template to use to render all the inner properties of an object along with the
  * title and description if available. If the object is expandable, then an `AddButton` is also rendered after all
@@ -35,6 +41,13 @@ export default function ObjectFieldTemplate<
   readonly,
   registry,
 }: ObjectFieldTemplateProps<T, S, F>) {
+  const [isOpen, setIsOpen] = useState(true)
+
+  // Handle open state changes - this is what gets called when clicking the title
+  const handleOpenChange = useCallback((open: boolean) => {
+    setIsOpen(open)
+  }, [])
+
   const uiOptions = getUiOptions<T, S, F>(uiSchema)
   const TitleFieldTemplate = getTemplate<"TitleFieldTemplate", T, S, F>(
     "TitleFieldTemplate",
@@ -51,45 +64,55 @@ export default function ObjectFieldTemplate<
   const {
     ButtonTemplates: { AddButton },
   } = registry.templates
+
   return (
-    <>
+    <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
       {title && (
-        <TitleFieldTemplate
-          id={titleId<T>(idSchema)}
-          title={title}
-          required={required}
-          schema={schema}
-          uiSchema={uiSchema}
-          registry={registry}
-        />
-      )}
-      HIHIHi
-      {description && (
-        <DescriptionFieldTemplate
-          id={descriptionId<T>(idSchema)}
-          description={description}
-          schema={schema}
-          uiSchema={uiSchema}
-          registry={registry}
-        />
-      )}
-      <div className="flex flex-col gap-2 !bg-green-900">
-        {properties.map((element: any, index: number) => (
-          <div key={index} className={`${element.hidden ? "hidden" : ""} flex`}>
-            <div className="w-full"> {element.content}</div>
+        <CollapsibleTrigger asChild>
+          <div className="cursor-pointer">
+            <TitleFieldTemplate
+              id={titleId<T>(idSchema)}
+              title={title}
+              required={required}
+              schema={schema}
+              uiSchema={uiSchema}
+              registry={registry}
+            />
           </div>
-        ))}
-        {canExpand(schema, uiSchema, formData) ? (
-          <AddButton
-            id={buttonId<T>(idSchema, "add")}
-            onClick={onAddClick(schema)}
-            disabled={disabled || readonly}
-            className="rjsf-object-property-expand"
+        </CollapsibleTrigger>
+      )}
+
+      <CollapsibleContent>
+        {description && (
+          <DescriptionFieldTemplate
+            id={descriptionId<T>(idSchema)}
+            description={description}
+            schema={schema}
             uiSchema={uiSchema}
             registry={registry}
           />
-        ) : null}
-      </div>
-    </>
+        )}
+        <div className="flex flex-col gap-2 !bg-orange-900">
+          {properties.map((element: any, index: number) => (
+            <div
+              key={index}
+              className={`${element.hidden ? "hidden" : ""} flex`}
+            >
+              <div className="w-full"> {element.content}</div>
+            </div>
+          ))}
+          {canExpand(schema, uiSchema, formData) ? (
+            <AddButton
+              id={buttonId<T>(idSchema, "add")}
+              onClick={onAddClick(schema)}
+              disabled={disabled || readonly}
+              className="rjsf-object-property-expand"
+              uiSchema={uiSchema}
+              registry={registry}
+            />
+          ) : null}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
