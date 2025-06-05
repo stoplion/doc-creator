@@ -98,8 +98,8 @@ export default function ArrayFieldTemplate<
             className="p-0 m-0 w-full mb-2"
           >
             <DragDropArrayItems
-              items={items}
-              ArrayFieldItemTemplate={ArrayFieldItemTemplate}
+              items={items as any}
+              ArrayFieldItemTemplate={ArrayFieldItemTemplate as any}
               onDragEnd={handleDragEnd}
             />
             {canAdd && (
