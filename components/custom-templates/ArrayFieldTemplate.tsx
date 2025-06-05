@@ -21,6 +21,30 @@ const DragDropArrayItems = dynamic(() => import("./DragDropArrayItems"), {
   ssr: false,
 })
 
+/** Helper function to determine if this is a top-level section
+ * Top-level sections have IDs like root_work, root_education, root_skills, etc.
+ */
+function isTopLevelSection(idSchema: any): boolean {
+  const id = idSchema?.$id || ""
+
+  if (!id) return false
+
+  // Split by underscore and filter out 'root'
+  const segments = id.split("_").filter((segment: string) => segment !== "root")
+
+  // Top-level sections should have exactly 1 segment after 'root'
+  // (no array indices, no nested paths)
+  const isTopLevel = segments.length === 1 && !/^\d+$/.test(segments[0])
+
+  console.log("🔍 Array Top-level check:", {
+    id,
+    segments,
+    isTopLevel,
+  })
+
+  return isTopLevel
+}
+
 /** The `ArrayFieldTemplate` component is the template used to render all items in an array.
  *
  * @param props - The `ArrayFieldItemTemplateType` props for the component
@@ -83,6 +107,9 @@ export default function ArrayFieldTemplate<
     [items]
   )
 
+  // Check if this is a top-level section for spacing
+  const isTopLevel = isTopLevelSection(idSchema)
+
   // Button templates are not overridden in the uiSchema
   // const {
   //   ButtonTemplates: { AddButton },
@@ -92,54 +119,56 @@ export default function ArrayFieldTemplate<
       <div className="m-0 flex p-0">
         <div className="m-0 w-full p-0">
           <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
-            {(uiOptions.title || title) && (
-              <CollapsibleTrigger asChild>
-                <div className="cursor-pointer hover:bg-gray-800/50 rounded-md p-1 -m-1 transition-colors group">
-                  <ArrayFieldTitleTemplate
-                    idSchema={idSchema}
-                    title={uiOptions.title || title}
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    required={required}
-                    registry={registry}
-                  />
-                </div>
-              </CollapsibleTrigger>
-            )}
-
-            <CollapsibleContent>
-              <ArrayFieldDescriptionTemplate
-                idSchema={idSchema}
-                description={uiOptions.description || schema.description}
-                schema={schema}
-                uiSchema={uiSchema}
-                registry={registry}
-              />
-              <div
-                key={`array-item-list-${idSchema.$id}`}
-                className="p-0 m-0 w-full mb-2"
-              >
-                <DragDropArrayItems
-                  items={items as any}
-                  ArrayFieldItemTemplate={ArrayFieldItemTemplate as any}
-                  onDragEnd={handleDragEnd}
-                />
-                {canAdd && (
-                  <div className="mt-2 flex">
-                    <AddButton
-                      id={buttonId<T>(idSchema, "add")}
-                      className="rjsf-array-item-add w-full"
-                      onClick={onAddClick}
-                      disabled={disabled || readonly}
+            <div className={isTopLevel ? "!bg-orange-900 rounded-lg" : ""}>
+              {(uiOptions.title || title) && (
+                <CollapsibleTrigger asChild>
+                  <div className="cursor-pointer hover:bg-gray-800/50 rounded-md p-1 transition-colors group">
+                    <ArrayFieldTitleTemplate
+                      idSchema={idSchema}
+                      title={uiOptions.title || title}
+                      schema={schema}
                       uiSchema={uiSchema}
+                      required={required}
                       registry={registry}
-                    >
-                      Add
-                    </AddButton>
+                    />
                   </div>
-                )}
-              </div>
-            </CollapsibleContent>
+                </CollapsibleTrigger>
+              )}
+
+              <CollapsibleContent>
+                <ArrayFieldDescriptionTemplate
+                  idSchema={idSchema}
+                  description={uiOptions.description || schema.description}
+                  schema={schema}
+                  uiSchema={uiSchema}
+                  registry={registry}
+                />
+                <div
+                  key={`array-item-list-${idSchema.$id}`}
+                  className="p-0 m-0 w-full mb-2"
+                >
+                  <DragDropArrayItems
+                    items={items as any}
+                    ArrayFieldItemTemplate={ArrayFieldItemTemplate as any}
+                    onDragEnd={handleDragEnd}
+                  />
+                  {canAdd && (
+                    <div className="mt-2 flex">
+                      <AddButton
+                        id={buttonId<T>(idSchema, "add")}
+                        className="rjsf-array-item-add w-full"
+                        onClick={onAddClick}
+                        disabled={disabled || readonly}
+                        uiSchema={uiSchema}
+                        registry={registry}
+                      >
+                        Add
+                      </AddButton>
+                    </div>
+                  )}
+                </div>
+              </CollapsibleContent>
+            </div>
           </Collapsible>
         </div>
       </div>

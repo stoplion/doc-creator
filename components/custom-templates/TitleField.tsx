@@ -115,16 +115,16 @@ export default function TitleField<
     // Top-level titles and array item titles - retain default styling
     console.log("⚪ Rendering DEFAULT title:", displayTitle)
     return (
-      <div id={id} className="my-1 flex flex-col gap-0.5">
+      <div id={id} className="my-1 flex flex-col">
         <h2 className="font-bold text-xl group-hover:underline group-hover:decoration-gray-400 group-hover:decoration-2 group-hover:underline-offset-2 transition-all">
           {displayTitle}
           {required && <span className="text-red-500 ml-1">*</span>}
         </h2>
-        <Separator
+        {/* <Separator
           dir="horizontal"
           style={{ height: "1px" }}
           className="bg-gray-300"
-        />
+        /> */}
       </div>
     )
   }

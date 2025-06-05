@@ -76,6 +76,30 @@ function isNestedObjectField<T, S extends StrictRJSFSchema = RJSFSchema>(
   return false
 }
 
+/** Helper function to determine if this is a top-level section
+ * Top-level sections have IDs like root_basics, root_work, root_education, etc.
+ */
+function isTopLevelSection(idSchema: any): boolean {
+  const id = idSchema?.$id || ""
+
+  if (!id) return false
+
+  // Split by underscore and filter out 'root'
+  const segments = id.split("_").filter((segment: string) => segment !== "root")
+
+  // Top-level sections should have exactly 1 segment after 'root'
+  // (no array indices, no nested paths)
+  const isTopLevel = segments.length === 1 && !/^\d+$/.test(segments[0])
+
+  console.log("🔍 Top-level check:", {
+    id,
+    segments,
+    isTopLevel,
+  })
+
+  return isTopLevel
+}
+
 /** The `ObjectFieldTemplate` is the template to use to render all the inner properties of an object along with the
  * title and description if available. If the object is expandable, then an `AddButton` is also rendered after all
  * the properties.
@@ -127,6 +151,9 @@ export default function ObjectFieldTemplate<
   // Determine if this object title should be styled as nested
   const isNested = isNestedObjectField(idSchema, schema)
 
+  // Check if this is a top-level section for spacing
+  const isTopLevel = isTopLevelSection(idSchema)
+
   // Create modified uiSchema to pass nesting context to TitleFieldTemplate
   const titleUiSchema = {
     ...uiSchema,
@@ -138,52 +165,54 @@ export default function ObjectFieldTemplate<
 
   return (
     <Collapsible open={isOpen} onOpenChange={handleOpenChange}>
-      {title && (
-        <CollapsibleTrigger asChild>
-          <div className="cursor-pointer hover:bg-gray-800/50 rounded-md p-1 -m-1 transition-colors group">
-            <TitleFieldTemplate
-              id={titleId<T>(idSchema)}
-              title={title}
-              required={required}
-              schema={schema}
-              uiSchema={titleUiSchema}
-              registry={registry}
-            />
-          </div>
-        </CollapsibleTrigger>
-      )}
-
-      <CollapsibleContent>
-        {description && (
-          <DescriptionFieldTemplate
-            id={descriptionId<T>(idSchema)}
-            description={description}
-            schema={schema}
-            uiSchema={uiSchema}
-            registry={registry}
-          />
-        )}
-        <div className="flex flex-col gap-2 !bg-orange-900">
-          {properties.map((element: any, index: number) => (
-            <div
-              key={index}
-              className={`${element.hidden ? "hidden" : ""} flex`}
-            >
-              <div className="w-full"> {element.content}</div>
+      <div className={isTopLevel ? "!bg-orange-900 rounded-lg" : ""}>
+        {title && (
+          <CollapsibleTrigger asChild>
+            <div className="cursor-pointer hover:bg-gray-800/50 rounded-md p-1 transition-colors group">
+              <TitleFieldTemplate
+                id={titleId<T>(idSchema)}
+                title={title}
+                required={required}
+                schema={schema}
+                uiSchema={titleUiSchema}
+                registry={registry}
+              />
             </div>
-          ))}
-          {canExpand(schema, uiSchema, formData) ? (
-            <AddButton
-              id={buttonId<T>(idSchema, "add")}
-              onClick={onAddClick(schema)}
-              disabled={disabled || readonly}
-              className="rjsf-object-property-expand"
+          </CollapsibleTrigger>
+        )}
+
+        <CollapsibleContent>
+          {description && (
+            <DescriptionFieldTemplate
+              id={descriptionId<T>(idSchema)}
+              description={description}
+              schema={schema}
               uiSchema={uiSchema}
               registry={registry}
             />
-          ) : null}
-        </div>
-      </CollapsibleContent>
+          )}
+          <div className="flex flex-col gap-2">
+            {properties.map((element: any, index: number) => (
+              <div
+                key={index}
+                className={`${element.hidden ? "hidden" : ""} flex`}
+              >
+                <div className="w-full"> {element.content}</div>
+              </div>
+            ))}
+            {canExpand(schema, uiSchema, formData) ? (
+              <AddButton
+                id={buttonId<T>(idSchema, "add")}
+                onClick={onAddClick(schema)}
+                disabled={disabled || readonly}
+                className="rjsf-object-property-expand"
+                uiSchema={uiSchema}
+                registry={registry}
+              />
+            ) : null}
+          </div>
+        </CollapsibleContent>
+      </div>
     </Collapsible>
   )
 }
